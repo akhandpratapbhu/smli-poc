@@ -8,7 +8,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import 'bootstrap/dist/js/bootstrap.bundle.min'; 
 import SparePartSaleInvoiceTable from './components/Home/griddata'
 import Sidebar from './components/Home/sidebar/sidebar'
-import VerticalLinearStepper from './components/Home/getform'
+import VerticalLinearStepper from './components/Home/getform/getform'
 import MaterialCardFormData from "./components/Home/AllFormsList";
 import ViewDetails from "./components/Home/viewDetails";
 import WelcomePage from "./components/Home/welcomePage";

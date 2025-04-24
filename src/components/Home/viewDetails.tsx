@@ -9,8 +9,6 @@ const ViewDetails = () => {
     const location = useLocation();
     const selectedRow = location.state?.entityData; // Get the passed data
     const model = location.state?.model;
-    console.log("model", model);
-    console.log("selectedRow", selectedRow);
     const [attributes, setAttributes] = useState<any[]>([]);
     const [dynamicData, setDynamicData] = useState<any>({});
     const [gridsData, setGridsData] = useState<any[]>([]);

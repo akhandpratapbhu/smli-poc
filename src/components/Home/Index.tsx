@@ -26,15 +26,12 @@ const MaterialTableFormData = () => {
   const [entities, setEntities] = useState<Entity[]>([]);
 
   useEffect(() => {
-    console.log(baseUrl);
     
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
       .then((data) => setEntities(data))
       .catch((error) => console.error("Error fetching entities:", error));
   }, []);
-
-  console.log(entities);
 
   const editRow = (entity: any) => {
     navigate(`/employee/index/${entity.id}`, { state: { entityData: entity } });

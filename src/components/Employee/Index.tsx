@@ -23,11 +23,9 @@ type Section = {
 const EntityForm = () => {
 
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-  console.log(import.meta.env.MODE);
   const location = useLocation();
   const navigate = useNavigate();
   const model = location.state?.entityData; // Get the passed data
-  console.log(typeof (model.id));
   const [sections, setSections] = useState<Section[]>([]);
   const [masters, setMasters] = useState([]);
   useEffect(() => {
@@ -54,7 +52,6 @@ const EntityForm = () => {
       setActiveTab(sections[0].id);
     }
   }, [sections]);
-  console.log(activeTab);
   useEffect(() => {
     if (sections.length > 0) {
       setActiveTab(sections[0].id);
@@ -76,7 +73,6 @@ const EntityForm = () => {
   });
   const [getAttributeData, setGetAttributeData] = useState([]);
   function getAttribute(master: any) {
-    console.log(master.id);
 
     fetch(`${baseUrl}/employee/GetAttributes?masterId=${master.id}`)
       .then((response) => response.json())
@@ -86,9 +82,7 @@ const EntityForm = () => {
   // Handle change for text inputs
   const handleInputChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    console.log(name, value, masters);
     const selectedMaster = masters.find((master: { id: number; name: string }) => master.id == (value));
-    console.log(selectedMaster);
     if (name === "mastersource" && selectedMaster) {
       getAttribute(selectedMaster);
     }
@@ -146,7 +140,6 @@ const EntityForm = () => {
 
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, item: string) => {
     event.dataTransfer.setData("text/plain", item);
-    console.log("item", item);
     setitemName(item)
     setFormData((prev) => ({
       ...prev, // Preserve existing state
@@ -161,7 +154,6 @@ const EntityForm = () => {
     const targetElement = event.target as HTMLElement;
 
     if (targetElement.closest(".table-drop-zone")) {
-      console.log("Dropped in TABLE");
       setDroppedLocation("table");
       if (itemName == "AddGrid") {
         setShowaddpartfieldFieldModal(true)
@@ -169,7 +161,6 @@ const EntityForm = () => {
         setShowFieldModal(true)
       }
     } else if (targetElement.closest(".form-drop-zone")) {
-      console.log("Dropped in FORM");
       setDroppedLocation("form");
       if (itemName == "AddGrid") {
         setShowaddpartfieldFieldModal(true)
@@ -194,11 +185,8 @@ const EntityForm = () => {
   });
   const [attributesofPartialFormData, setAttributesofPartialFormData] = useState<AttributeofPartialFormData[]>([]);
   const getSection = async (sId: React.Key | null | undefined) => {
-    console.log("Fetching section with ID:", sId);
     setActiveSectionId((prev) => {
       const newId = sId as number;
-      console.log("Previous activeSectionId:", prev);
-      console.log("New activeSectionId:", newId);
       return newId;
     });
     try {
@@ -215,13 +203,11 @@ const EntityForm = () => {
 
       const PartialFormData = await response.json();  // Convert response to JSON
       setAttributesofPartialFormData(PartialFormData)
-      console.log("PartialForm:", PartialFormData);
     } catch (error) {
       console.error("Error posting data:", error);
     }
   }
 
-  console.log("activeSectionId:", activeSectionId);
   const addSectionModel = () => {
     setShowSectionModal(true);
   };
@@ -273,7 +259,6 @@ const EntityForm = () => {
   const [tableCustomFields, setTableCustomFields] = useState<any[]>([]);
 
   const saveField = () => {
-    console.log("Saving new field...", formData);
 
     let maxSortOrder = 0;
     if (attributesofPartialFormData.length > 0) {
@@ -318,11 +303,9 @@ const EntityForm = () => {
       setFieldAllAttributes(prev => [...prev, newField]);
     } else if (droppedLocation === "table") {
       // Custom table field logic
-      console.log("newField", newField);
       setsectionAttributestabularForm((prev) => {
         const sectionId = activeSectionId as number;
         const existingAttributes = prev[sectionId] || [];
-        console.log("existingAttributes", existingAttributes);
 
         return {
           ...prev,
@@ -341,18 +324,15 @@ const EntityForm = () => {
     handleCloseFieldModal();
     setDroppedLocation(null); // Reset drop location
   };
-  console.log("tableCustomFields", tableCustomFields);
 
   const [selectedEntity, setSelectedEntity] = useState("");
   const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
   const [allcolumndata, setallcolumndata] = useState<Record<string, string[]>>({});
   const handleEntityChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
-    console.log(name, value, masters);
     // Reset selected checkboxes
     setSelectedColumns([]);
     const selectedMaster = masters.find((master: { id: number; name: string }) => master.id == (value));
-    console.log(selectedMaster);
     if (selectedMaster) {
       getAttribute(selectedMaster);
     }
@@ -388,7 +368,6 @@ const EntityForm = () => {
         [selectedEntity]: mergedColumns,
       };
 
-      console.log("🧠 ID Map Updated:", updatedData);
       return updatedData;
     });
 
@@ -406,8 +385,6 @@ const EntityForm = () => {
 
   const formAttributes = attributesofPartialFormData.filter(attr => attr.dataType !== 'grid');
   const gridAttributes = attributesofPartialFormData.filter(attr => attr.dataType === 'grid');
-  console.log("attributesofPartialFormData", attributesofPartialFormData);
-  console.log("gridAttributes", gridAttributes);
   // Construct updated grid attribute
   const finalgrid = {
     id: 0,
@@ -432,7 +409,6 @@ const EntityForm = () => {
 
 
 
-  console.log(gridAttributes[0]);
   let updatefinalgrid = { ...gridAttributes[0] };
 
   const existingGridElements = gridAttributes[0]?.gridMaster?.gridElements || [];
@@ -477,18 +453,14 @@ const EntityForm = () => {
 
       if (hasGridData) {
         updatedformsection = [...fieldAllAttributes, finalgrid];
-        console.log("Field attributes + final grid:", updatedformsection);
       } else {
         updatedformsection = [...fieldAllAttributes];
-        console.log("Only field attributes available:", updatedformsection);
       }
     }
     else if (finalgrid && !fieldAllAttributes) {
       updatedformsection = [finalgrid];
-      console.log("Only final grid is available:", updatedformsection);
     } else {
       updatedformsection = [...fieldAllAttributes, finalgrid];
-      console.log("No form/grid attributes, merged both:", updatedformsection);
     }
 
     // Case 2: Only grid attributes are present
@@ -499,10 +471,8 @@ const EntityForm = () => {
 
     if (updatedGridAttributes && !fieldAllAttributes) {
       updatedformsection = [updatedGridAttributes];
-      console.log("only update grid:", updatedformsection);
     } else if (updatedGridAttributes && fieldAllAttributes) {
       updatedformsection = [...fieldAllAttributes, updatedGridAttributes];
-      console.log("updatedGridAttributes field and fieldAllAttributes attributes available:", updatedformsection);
     }
 
 
@@ -513,10 +483,8 @@ const EntityForm = () => {
 
     if (hasGridData) {
       updatedformsection = [...fieldAllAttributes, finalgrid];
-      console.log("Field attributes + final grid:", updatedformsection);
     } else {
       updatedformsection = [...fieldAllAttributes];
-      console.log("Only field attributes available:", updatedformsection);
     }
 
     // Case 4: Both form and grid attributes are present
@@ -527,12 +495,7 @@ const EntityForm = () => {
       ...formAttributes,
       updatedGridAttributes
     ];
-    console.log("Both form and grid attributes present:", updatedformsection);
   }
-
-
-  console.log(activeSectionId, sections);
-
 
 
   const saveForm = async () => {
@@ -602,7 +565,7 @@ const EntityForm = () => {
               <div className="col-md-6">
                 <h5>Draggable Items</h5>
                 <ul className="list-group">
-                  {["String", "Number", "Dropdown", "AddGrid"].map((item, index) => (
+                  {["String", "Number", "Dropdown","Date", "AddGrid"].map((item, index) => (
                     <li
                       key={index}
                       className="list-group-item"
@@ -622,7 +585,7 @@ const EntityForm = () => {
                       <div key={section.id}>
 
                         <button
-                          className={`list-group-item ${activeSectionId === section.id ? "active" : ""}`}
+                          className={`list-group-item ${activeSectionId == section.id ? "active" : ""}`}
                           onClick={() => getSection(section.id)}
                         
                         >

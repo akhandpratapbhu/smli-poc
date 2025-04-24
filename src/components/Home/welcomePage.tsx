@@ -6,15 +6,18 @@ export default function WelcomePage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white p-6">
       <motion.h1
-        className="text-5xl font-bold mb-4 drop-shadow-lg"
+        className="text-5xl font-bold mb-4 drop-shadow-lg text-center"
         initial={{ opacity: 0, y: -50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
+        style={{color: "black", marginTop: "4px"}}
       >
         Welcome to <span className="text-yellow-300">SMLI DEMO</span>
       </motion.h1>
 
-      <motion.img
+      <div style={{display: "flex", justifyContent: "center"}}>
+        <motion.img
+        
         src="https://images.jdmagicbox.com/quickquotes/images_main/sml-isuzu-prestige-gs-2515-pickup-truck-271956192-ufeha.png"
         alt="Demo"
         className="rounded-2xl shadow-xl w-full max-w-lg mb-6"
@@ -22,6 +25,7 @@ export default function WelcomePage() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, delay: 0.5 }}
       />
+      </div>
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}

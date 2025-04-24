@@ -591,9 +591,9 @@ const EntityForm = () => {
   return (
     <>
       <div className="container mt-4">
-        <h1 className="text-center">{model.label}</h1>
+        <h3>{model.label}</h3>
         <input id="EntityId" type="hidden" value={model.id} />
-        <input id="EntityName" type="hidden" value={model.name} />
+        <input id="EntityName" type="hidden" value={model.name}/>
         <input id="SectionId" type="hidden" value={model.sectionId} />
 
         <div className="row border p-3 rounded" style={{ borderColor: "black" }}>
@@ -626,7 +626,7 @@ const EntityForm = () => {
                           onClick={() => getSection(section.id)}
                         
                         >
-                          {section.sectionName}
+                          <span style={{textTransform:'capitalize'}}>{section.sectionName}</span>
                         </button>
 
                       </div>

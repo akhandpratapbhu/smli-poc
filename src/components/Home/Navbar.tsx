@@ -1,12 +1,13 @@
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import mainLogo from "../../assets/smlLogo.png";
 const Navbar = () => {
   return (
-    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: "#f6f6f6" }}>
+    <nav className="navbar navbar-expand-lg" style={{ backgroundColor: "#ea3434", height: "60px" }}>
   
-      <div className="container">
-      <Link style={{ textDecoration: "none" ,color:"red"}} to="/welcomepage">SMLI- DEMO</Link>
+      <div className="container-fluid">
+        <img src={mainLogo} className="img-logo" />
+      
       <button 
           className="navbar-toggler" 
           type="button" 
@@ -20,14 +21,14 @@ const Navbar = () => {
         </button>
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/">Master</Link>
+            <li className="nav-item" >
+              <Link className="nav-link" style={{color: "white"}} to="/">Master</Link>
             </li>
             {/* <li className="nav-item">
               <Link className="nav-link" to="/about">Privacy</Link>
             </li> */}
-            <li className="nav-item">
-              <Link className="nav-link" to="/AddFormDataList">Add Master Data</Link>
+            <li className="nav-item" >
+              <Link className="nav-link" style={{color: "white"}} to="/AddFormDataList">Add Master Data</Link>
             </li>
           </ul>
         </div>

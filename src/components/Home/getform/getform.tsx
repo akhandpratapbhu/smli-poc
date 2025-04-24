@@ -555,44 +555,44 @@ export default function VerticalLinearStepper() {
                                                                                                 const [idPart, namePart] = field.split('_'); // Split to get name
 
                                                                                                 return (
-                                                                                                    <>
-
-                                                                                                        <td key={`field-${index}`}>
-                                                                                                            {namePart === 'partno' ? (
-                                                                                                                <div>
-                                                                                                                    <input
-                                                                                                                        type="text"
-                                                                                                                        name={namePart}
-                                                                                                                        className="form-control"
-                                                                                                                        value={gridFormValues[attr.id]?.[namePart] || ''}
-                                                                                                                        onChange={(e) => handleInputChangedatagrid(e, String(attr.id))}
-                                                                                                                        placeholder={`Enter ${namePart}`}
-                                                                                                                        list={`autocomplete-${namePart}`}
-                                                                                                                    />
-                                                                                                                    <datalist id={`autocomplete-${namePart}`}>
-                                                                                                                        {autocompleteData
-                                                                                                                            .filter(item =>
-                                                                                                                                item.partno.toLowerCase().includes((inputValues[namePart] || '').toLowerCase())
-                                                                                                                            )
-                                                                                                                            .map(item => (
-                                                                                                                                <option key={item.ID} value={item.partno}>
-                                                                                                                                    {item.partdescription}
-                                                                                                                                </option>
-                                                                                                                            ))}
-                                                                                                                    </datalist>
-                                                                                                                </div>
-                                                                                                            ) : (
+                                                                                                    <React.Fragment key={`field-${index}`}>
+                                                                                                    <td>
+                                                                                                        {namePart === 'partno' ? (
+                                                                                                            <div>
                                                                                                                 <input
                                                                                                                     type="text"
                                                                                                                     name={namePart}
                                                                                                                     className="form-control"
                                                                                                                     value={gridFormValues[attr.id]?.[namePart] || ''}
-                                                                                                                    onChange={(e) => handleGridInputChange(e, String(attr.id))}
+                                                                                                                    onChange={(e) => handleInputChangedatagrid(e, String(attr.id))}
                                                                                                                     placeholder={`Enter ${namePart}`}
+                                                                                                                    list={`autocomplete-${namePart}`}
                                                                                                                 />
-                                                                                                            )}
-                                                                                                        </td>
-                                                                                                    </>
+                                                                                                                <datalist id={`autocomplete-${namePart}`}>
+                                                                                                                    {autocompleteData
+                                                                                                                        .filter(item =>
+                                                                                                                            item.partno.toLowerCase().includes((inputValues[namePart] || '').toLowerCase())
+                                                                                                                        )
+                                                                                                                        .map(item => (
+                                                                                                                            <option key={item.ID} value={item.partno}>
+                                                                                                                                {item.partdescription}
+                                                                                                                            </option>
+                                                                                                                        ))}
+                                                                                                                </datalist>
+                                                                                                            </div>
+                                                                                                        ) : (
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                name={namePart}
+                                                                                                                className="form-control"
+                                                                                                                value={gridFormValues[attr.id]?.[namePart] || ''}
+                                                                                                                onChange={(e) => handleGridInputChange(e, String(attr.id))}
+                                                                                                                placeholder={`Enter ${namePart}`}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </td>
+                                                                                                </React.Fragment>
+                                                                                                
                                                                                                 );
                                                                                             })}
 

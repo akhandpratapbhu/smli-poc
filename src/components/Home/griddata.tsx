@@ -73,7 +73,6 @@ const SparePartSaleInvoiceTable: React.FC = () => {
 
     const location = useLocation();
     const model = location.state?.entityData; // Get the passed data
-    console.log(model);
     const [page, setPage] = useState<number>(0);
     const [rowsPerPage, setRowsPerPage] = useState<number>(10);
     const [selected, setSelected] = useState<string[]>([]);
@@ -266,8 +265,6 @@ const SparePartSaleInvoiceTable: React.FC = () => {
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
     const handleActionClick = (row: SpareData) => {
-        console.log("row", row);
-
         setSelectedRow(row);
         setIsPopupOpen(true);
     };
@@ -305,22 +302,16 @@ const SparePartSaleInvoiceTable: React.FC = () => {
             console.error("Error fetching data:", error);
           });
       };
-      
-      
-    console.log("dynamicPrintAllData",dynamicPrintAllData);
-    
+          
     const handleAction = (type: "view" | "edit" | "print" | "cancel") => {
         if (!selectedRow) return;
-        console.log("type",type);
         
         switch (type) {
             case "view":
-                console.log("View clicked:", selectedRow);
                 handleViewRoutePage(selectedRow)
                 break;
 
             case "edit":
-                console.log("Edit clicked:", selectedRow);
                 handleGetFormRoutePage(selectedRow)
                 break;
 
@@ -330,7 +321,6 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                   
 
             case "cancel":
-                console.log("Cancel clicked:", selectedRow);
                 break;
          
         }
@@ -366,9 +356,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                         }}
                     >
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            {/* <Typography variant="h6" component="h1" sx={{ fontWeight: 500 }}>
-            Spare-spare part sale Invoice
-            </Typography> */}
+                          
                             <TextField
                                 size="small"
                                 placeholder="Search"
@@ -573,7 +561,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
 
                             <TableBody>
                                 {sortedData.length === 0 ? (
-                                    <TableRow>
+                                    <TableRow >
                                         <TableCell colSpan={columns.filter(col => col.visible).length + 1} align="center">
                                             <div style={{ textAlign: "center", padding: "2rem" }}>
                                                 <img

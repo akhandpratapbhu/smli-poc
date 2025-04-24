@@ -10,6 +10,9 @@ import React, { useEffect, useState } from 'react';
 import './getform.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
 const defaultSteps = [
     'Job Card Details', 'Vehicle Information', 'Customer Information',
     'Service Details', 'Sales & Warranty Information', 'Mechanic & Workshop Details',
@@ -24,7 +27,6 @@ export default function VerticalLinearStepper() {
     const location = useLocation();
     const model = location.state?.entityData; // Get the passed data
     const selectedRow = location.state?.selectedRow;
-    console.log(model);
     const isStepSkipped = (step: number) => skipped.has(step);
     const baseUrl = import.meta.env.VITE_API_BASE_URL;
 
@@ -78,7 +80,6 @@ export default function VerticalLinearStepper() {
 
     useEffect(() => {
         const id = model?.id ?? 9; // Use model.id if available, otherwise fallback to 9
-        console.log("id", id);
         fetch(`${baseUrl}/employee/GetFormData?id=${id}`)
             .then((response) => response.json())
             .then((data) => setallSectionformData(data))
@@ -96,17 +97,6 @@ export default function VerticalLinearStepper() {
         }
     };
 
-    // const fetchAutocompleteDataByOnChange = async (partNo: string) => {
-    //     try {
-    //         const response = await fetch(`${baseUrl}/spare/GetPartMasterByPartNo?partno=${partNo}`);
-    //         const data = await response.json();
-    //         console.log("datra", data);
-
-    //         setAutocompleteData(data);
-    //     } catch (error) {
-    //         console.error('Error fetching autocomplete data:', error);
-    //     }
-    // };
     // Fetch data when component mounts
     useEffect(() => {
         fetchAutocompleteData();
@@ -130,16 +120,10 @@ export default function VerticalLinearStepper() {
     );
 
 
-    console.log(attributes, dynamicData, gridsData);
-
-    console.log(allSectionformData);
-
     useEffect(() => {
         if (!allSectionformData) return; // wait for data
 
         const entityData = allSectionformData;
-        console.log("entityData", entityData.formSections);
-
         const sectionData = entityData.formSections.map((section: any) => ({
             ...section,
             attributes: entityData.attributes
@@ -149,7 +133,6 @@ export default function VerticalLinearStepper() {
 
         setSection(sectionData);
     }, [allSectionformData]);
-    console.log("sectionData", section);
     // This runs when section data is updated
     useEffect(() => {
         if (section.length > 0) {
@@ -160,19 +143,35 @@ export default function VerticalLinearStepper() {
         }
     }, [section]);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, attr: any) => {
-        const { value } = e.target;
-        console.log("intstringchangefield", attr.name, value);
+    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, attr: any) => {
+    //     const { value } = e.target;
+    //     console.log("intstringchangefield", attr.name, value);
 
+    //     setFormData(prev => ({
+    //         ...prev,
+    //         [attr.id]: {
+    //             ...prev[attr.id],
+    //             name: attr.name,
+    //             value: value,
+    //         },
+    //     }));
+    // };
+    const handleChange = (
+        e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
+        attr: { id: number | string }
+      ) => {
+        const { value } = e.target;
+        const key = String(attr.id);
+      
         setFormData(prev => ({
-            ...prev,
-            [attr.id]: {
-                ...prev[attr.id],
-                name: attr.name,
-                value: value,
-            },
+          ...prev,
+          [key]: {
+            ...prev[key],
+            value,
+          },
         }));
-    };
+      };
+      
     useEffect(() => {
         const initialData: any = {};
         section.forEach(sec => {
@@ -220,7 +219,6 @@ export default function VerticalLinearStepper() {
 
 
     const fetchDropdownOptions = async (attr: any) => {
-        console.log("attr", attr);
 
         try {
             const response = await fetch(`${baseUrl}/employee/addDropdown`, {
@@ -243,8 +241,6 @@ export default function VerticalLinearStepper() {
             }
 
             const data = await response.json();
-            console.log("data", data);
-
             setFormData((prev) => ({
                 ...prev,
                 [attr.id]: {
@@ -267,7 +263,7 @@ export default function VerticalLinearStepper() {
         attrId: string
     ) => {
         const { name, value } = e.target;
-    
+
         // Update form values for this specific grid (by attrId)
         setGridFormValues(prev => {
             // Merge previous grid form values with the updated value
@@ -275,23 +271,10 @@ export default function VerticalLinearStepper() {
                 ...prev,
                 [attrId]: {}
             };
-            // setGridFormValues(prev => ({
-            //     ...prev,
-            //     [attrId]: {}
-            // }));
+          
             const selectedPart = autocompleteData.find(item => item.partno === value);
-            console.log("selectedPartcheck", selectedPart, attrId, section);
-    
-            const gridElements = section
-                .flatMap(sec =>
-                    sec.attributes
-                        .filter((attr: { dataType: string; gridMaster: { gridElements: any; }; }) => attr.dataType === 'grid' && attr.gridMaster?.gridElements)
-                        .flatMap((attr: { gridMaster: { gridElements: any; }; }) => attr.gridMaster.gridElements)
-                );
-    
-            console.log("gridElements", gridElements);
             const cleanedFieldsMap: Record<string, string[]> = {};
-    
+
             section.forEach(sec => {
                 sec.attributes
                     .filter((attr: { dataType: string; gridMaster: { gridElements: any; }; }) => attr.dataType === 'grid' && attr.gridMaster?.gridElements)
@@ -302,32 +285,30 @@ export default function VerticalLinearStepper() {
                         cleanedFieldsMap[attr.id] = fieldGroup;
                     });
             });
-    
-            console.log("cleanedFieldsMap", cleanedFieldsMap);
-    
+
+
             if (selectedPart && cleanedFieldsMap[attrId]) {
                 const fieldGroup = cleanedFieldsMap[attrId];
-    
+
                 const updated = fieldGroup.reduce((acc: any, field: string) => {
                     if (field in selectedPart) {
                         acc[field] = selectedPart[field];
                     }
                     return acc;
                 }, {});
-    
+
                 // Merge the selected part data into the previous state (same as before)
                 updatedGridFormValues[attrId] = {
                     ...updatedGridFormValues[attrId],
                     ...updated
                 };
             }
-    
+
             return updatedGridFormValues;
         });
-    
-        console.log("selectedPartcheckafter", gridFormValues);
+
     };
-    
+
     const handleGridInputChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         attrId: string
@@ -341,40 +322,30 @@ export default function VerticalLinearStepper() {
             }
         }));
     };
-    console.log("selectedPartcheckafter", gridFormValues);
 
-    console.log("autocompleteData", autocompleteData, inputValues);
-
-    // const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const { name, value } = e.target;
-    //     console.log(name, value);
-    //     setFormValues(prev => ({ ...prev, [name]: value }));
-    //     console.log(formData, formValues);
-    // };
-    // console.log(formValues);
     const handleAddRow = (attrId: string) => {
         const currentForm = gridFormValues[attrId] || {};
-    
+
         // Always assign ID as "0" for a newly added row
         const newRow: Record<string, string> = {
             ID: "0",
             ...currentForm
         };
-    
+
         setGridSubmittedRows(prev => ({
             ...prev,
             [attrId]: [...(prev[attrId] || []), newRow]
         }));
-    
+
         // Clear the form after adding
         setGridFormValues(prev => ({
             ...prev,
             [attrId]: {}
         }));
     };
-    
-    
-    
+
+
+
     const handleDeleteRow = (attrId: string, indexToDelete: number) => {
         setGridSubmittedRows(prev => ({
             ...prev,
@@ -427,10 +398,6 @@ export default function VerticalLinearStepper() {
         ...transformedData      // Spread to include transformedData
     ];
 
-
-    console.log("completeData", completeData);
-
-
     const handleSubmit = async () => {
 
         try {
@@ -448,7 +415,7 @@ export default function VerticalLinearStepper() {
                     formName: model?.label ?? 'sale-Invoice',
                     fieldsDataModel: completeData,
                 };
-            console.log(requestBody);
+          
 
             const response = await fetch(`${baseUrl}/employee/InsertFormData`, {
                 method: "POST",
@@ -508,7 +475,7 @@ export default function VerticalLinearStepper() {
 
                 {/* Form/Card Section */}
                 <Box sx={{ flexGrow: 1 }}>
-                    <Card sx={{ p: 2 }}>
+                    <Card sx={{ p: 2 }} style={{backgroundColor:"#ffff9" , overflow: "visible"}}>
                         <CardContent>
                             {activeStep === steps.length ? (
                                 <React.Fragment>
@@ -525,14 +492,13 @@ export default function VerticalLinearStepper() {
                                         Step {activeStep + 1}: {steps[activeStep]}
                                     </Typography>
 
-                                    <Typography sx={{ mt: 1, mb: 3 }}>
+                                    <Typography sx={{ mt: 1, mb: 3 }} component="div">
                                         <div className="col-md-10">
                                             <div className="tab-content">
                                                 {section
                                                     .filter((_, index) => index === activeStep) // 👈 Only show the active section
                                                     .map((section, sectionIndex) => (
                                                         <div key={sectionIndex} className="mb-4">
-                                                            {/* <h5>{section.sectionName}</h5> */}
 
                                                             {section.attributes.map((attr: {
                                                                 id: string | number;
@@ -587,47 +553,46 @@ export default function VerticalLinearStepper() {
                                                                                             .flatMap((gridItem: { valueField: string[] }) => gridItem.valueField)
                                                                                             .map((field: string, index: number) => {
                                                                                                 const [idPart, namePart] = field.split('_'); // Split to get name
-                                                                                                console.log(idPart);
 
                                                                                                 return (
-                                                                                                    <>
-
-                                                                                                        <td key={`field-${index}`}>
-                                                                                                            {namePart === 'partno' ? (
-                                                                                                                <div>
-                                                                                                                    <input
-                                                                                                                        type="text"
-                                                                                                                        name={namePart}
-                                                                                                                        className="form-control"
-                                                                                                                        value={gridFormValues[attr.id]?.[namePart] || ''}
-                                                                                                                        onChange={(e) => handleInputChangedatagrid(e, String(attr.id))}
-                                                                                                                        placeholder={`Enter ${namePart}`}
-                                                                                                                        list={`autocomplete-${namePart}`}
-                                                                                                                    />
-                                                                                                                    <datalist id={`autocomplete-${namePart}`}>
-                                                                                                                        {autocompleteData
-                                                                                                                            .filter(item =>
-                                                                                                                                item.partno.toLowerCase().includes((inputValues[namePart] || '').toLowerCase())
-                                                                                                                            )
-                                                                                                                            .map(item => (
-                                                                                                                                <option key={item.ID} value={item.partno}>
-                                                                                                                                    {item.partdescription}
-                                                                                                                                </option>
-                                                                                                                            ))}
-                                                                                                                    </datalist>
-                                                                                                                </div>
-                                                                                                            ) : (
+                                                                                                    <React.Fragment key={`field-${index}`}>
+                                                                                                    <td>
+                                                                                                        {namePart === 'partno' ? (
+                                                                                                            <div>
                                                                                                                 <input
                                                                                                                     type="text"
                                                                                                                     name={namePart}
                                                                                                                     className="form-control"
                                                                                                                     value={gridFormValues[attr.id]?.[namePart] || ''}
-                                                                                                                    onChange={(e) => handleGridInputChange(e, String(attr.id))}
+                                                                                                                    onChange={(e) => handleInputChangedatagrid(e, String(attr.id))}
                                                                                                                     placeholder={`Enter ${namePart}`}
+                                                                                                                    list={`autocomplete-${namePart}`}
                                                                                                                 />
-                                                                                                            )}
-                                                                                                        </td>
-                                                                                                    </>
+                                                                                                                <datalist id={`autocomplete-${namePart}`}>
+                                                                                                                    {autocompleteData
+                                                                                                                        .filter(item =>
+                                                                                                                            item.partno.toLowerCase().includes((inputValues[namePart] || '').toLowerCase())
+                                                                                                                        )
+                                                                                                                        .map(item => (
+                                                                                                                            <option key={item.ID} value={item.partno}>
+                                                                                                                                {item.partdescription}
+                                                                                                                            </option>
+                                                                                                                        ))}
+                                                                                                                </datalist>
+                                                                                                            </div>
+                                                                                                        ) : (
+                                                                                                            <input
+                                                                                                                type="text"
+                                                                                                                name={namePart}
+                                                                                                                className="form-control"
+                                                                                                                value={gridFormValues[attr.id]?.[namePart] || ''}
+                                                                                                                onChange={(e) => handleGridInputChange(e, String(attr.id))}
+                                                                                                                placeholder={`Enter ${namePart}`}
+                                                                                                            />
+                                                                                                        )}
+                                                                                                    </td>
+                                                                                                </React.Fragment>
+                                                                                                
                                                                                                 );
                                                                                             })}
 
@@ -671,10 +636,6 @@ export default function VerticalLinearStepper() {
                                                                                     ) || []
                                                                                 ];
 
-
-                                                                                console.log("fieldNames", fieldNames);
-
-
                                                                                 return (
                                                                                     <table className="addtable table-bordered" style={{ border: '2px solid green', width: '100%', marginTop: '10px' }}>
                                                                                         <thead>
@@ -712,7 +673,43 @@ export default function VerticalLinearStepper() {
 
                                                                         </div>
 
-                                                                    ) : (
+                                                                    ) : attr.dataType.toLowerCase() === "date" ? (
+                                                                        <div style={{ position: "relative", width: "100%" }}>
+                                                                        <DatePicker
+                                                                          selected={
+                                                                            formData[String(attr.id)]?.value
+                                                                              ? new Date(formData[String(attr.id)].value)
+                                                                              : null
+                                                                          }
+                                                                          onChange={(date: Date | null) => {
+                                                                            if (date) {
+                                                                              handleChange({ target: { value: date.toISOString().split("T")[0] } }, attr);
+                                                                            } else {
+                                                                              handleChange({ target: { value: "" } }, attr);
+                                                                            }
+                                                                          }}
+                                                                          dateFormat="yyyy-MM-dd"
+                                                                          className="form-control"
+                                                                          showMonthDropdown
+                                                                          showYearDropdown
+                                                                          dropdownMode="select"
+                                                                        />
+                                                                        <i
+                                                                          className="fa fa-calendar"
+                                                                          style={{
+                                                                            position: "absolute",
+                                                                            right: "10px",
+                                                                            top: "50%",
+                                                                            transform: "translateY(-50%)",
+                                                                            pointerEvents: "none",
+                                                                            color: "#007bff", // blue
+                                                                            fontSize: "16px",
+                                                                          }}
+                                                                        ></i>
+                                                                      </div>
+                                                                      
+                                                                      )
+                                                                       : (
                                                                         <input
                                                                             type={attr.dataType.toLowerCase() === "int" ? "number" : "text"}
                                                                             className="form-control"
@@ -720,6 +717,8 @@ export default function VerticalLinearStepper() {
                                                                             onChange={(e) => handleChange(e, attr)}
                                                                         />
                                                                     )}
+
+
                                                                 </div>
 
 

@@ -18,19 +18,20 @@ function App() {
       <div className="container-fluid">
         <div className="row">
           {/* Full-width Navbar */}
-          <div className="col-12"style={{ backgroundColor: "#f6f6f6" }}>
+          <div className="col-12"style={{ backgroundColor: "#ea3434" }}>
             <Navbar />
           </div>
         </div>
 
         <div className="row" style={{ height: "calc(100vh - 60px)" }}>
           {/* Sidebar on left */}
-          <div className="col-2 p-0" style={{ backgroundColor: "rgb(226 39 57)" }}>
+          <div className="col-2 p-0" style={{ height: "calc(100vh - 60px)",backgroundColor: "#f6f6f6" }}>
             <Sidebar />
           </div>
 
           {/* Main content on right */}
-          <div className="col-10 p-3" style={{ overflowY: "auto", backgroundColor: "#f8f9fa" }}>
+          {/* backgroundColor: "rgb(225 225 225)"  */}
+          <div className="col-10" style={{ overflow: "hidden", height: "calc(100vh - 60px)"}}>
             <Routes>
               <Route path="/" element={<MaterialTableFormData />} />
               <Route path="/AddFormDataList" element={<MaterialCardFormData />} />

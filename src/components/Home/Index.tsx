@@ -55,7 +55,7 @@ const MaterialTableFormData = () => {
   };
 
   return (
-    <TableContainer component={Paper} sx={{ maxWidth: 900, margin: "auto", marginTop: 4 }}>
+    <TableContainer component={Paper} sx={{ maxWidth: 900, margin: "auto", marginTop: 4}}>
       <Table>
         <TableHead>
           <TableRow sx={{ backgroundColor: "#333", color: "white" }}>

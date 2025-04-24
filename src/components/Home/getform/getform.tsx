@@ -442,7 +442,7 @@ export default function VerticalLinearStepper() {
                 <span style={{ font: "40px", padding: '5px', margin: '10px' }}>{model.label}</span>
                 <button
                     onClick={() => navigate(`/allGrid/${model.id}`, { state: { entityData: model } })}
-                    style={{ color: "white", backgroundColor: "blue", borderRadius: '10px', width: "100px", height: "40px", padding: '5px' }}
+                    style={{ color: "white", backgroundColor: "rgb(81 79 79)", borderRadius: '10px', width: "100px", height: "40px", padding: '5px' }}
                 >
                     BACK
                 </button>
@@ -749,7 +749,7 @@ export default function VerticalLinearStepper() {
                                                     Skip
                                                 </Button>
                                             )}
-                                            <Button variant="contained" onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
+                                            <Button variant="contained" style={{backgroundColor: "#ea3434"}} onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
                                                 {activeStep === steps.length - 1
                                                     ? selectedRow
                                                         ? 'Update'

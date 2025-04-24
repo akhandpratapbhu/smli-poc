@@ -29,7 +29,7 @@ const MaterialCardFormData = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState<Entity[]>([]);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
+console.log(baseUrl);
   useEffect(() => {
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
@@ -58,27 +58,31 @@ const MaterialCardFormData = () => {
 
   return (
 
-    <Grid container spacing={3} sx={{ padding: 4 }}>
+   <div style={{height: "inherit", overflowY: "auto"}}>
+     <Grid container spacing={3} sx={{ padding: 4 }}>
       {entities.map((entity) => (
         <Grid  key={entity.id}>
           <Tooltip
-            title={entity.isActive ? "This entity is Active" : "This entity is Inactive"}
+            title={entity.isActive ? entity.name : "This entity is Inactive"}
             arrow
             placement="top"
           >
             <Card
               sx={{
                 height: "100%",
-                backgroundColor: entity.isActive ? "#e8f5e9" : "#f9f9f9",
+                width: "320px",
+                backgroundColor: entity.isActive ? "#f6f6f6" : "#f6f6f6",
                 padding: 2,
                 transition: "0.3s",
                 '&:hover': {
-                  backgroundColor: entity.isActive ? "#c8e6c9" : "#eeeeee",
+                  backgroundColor: entity.isActive ? "#dad7d7" : "#dad7d7",
                   boxShadow: 4,
                   cursor: "pointer",
                 },
               }}
             >
+
+
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   {entity.name}
@@ -99,10 +103,10 @@ const MaterialCardFormData = () => {
                 </Typography>
                 <Button
                   variant="contained"
-                  sx={{ backgroundColor: "green", color: "white", marginRight: 1 }}
+                  sx={{ backgroundColor: "#ea3434", color: "white", marginRight: 1 }}
                   onClick={() => addData(entity)}
                 >
-                  ADD DATA
+                  Add Data
                 </Button>
               </CardContent>
             </Card>
@@ -110,6 +114,7 @@ const MaterialCardFormData = () => {
         </Grid>
       ))}
     </Grid>
+   </div>
     
   );
 };

@@ -331,13 +331,14 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                 <span style={{ font: "40px", padding: '5px', margin: '10px' }}>{model.label}</span>
                 <button
                     onClick={() => navigate(`/employee/addFormData/${model.id}`, { state: { entityData: model } })}
-                    style={{ color: "white", backgroundColor: "red", borderRadius: '10px', width: "100px", height: "40px", padding: '5px' }}
+                    style={{ color: "white", backgroundColor: "#ea3434", borderRadius: '10px', width: "100px", height: "40px", padding: '5px' }}
                 >
                     + Add New
                 </button>
             </div>
             <div className="card" style={{
                 display: "flex",
+                
                 justifyContent: "space-between",
                 alignItems: "center",
                 backgroundColor: "#f5f5f5", // light gray card background
@@ -463,29 +464,30 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                                     sx: { p: 2, width: 650 },
                                 }}
                             >
-                                <Typography variant="subtitle2" sx={{ mb: 1 }} component="div">
-                                    filter Columns-wise
+                                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                    Filters
                                 </Typography>
-                                {columns.map((column) => (
-                                    <MenuItem key={column.id} dense>
-                                        <TextField
-                                            placeholder={`Search ${column.label}`}
-                                            variant="outlined"
-                                            size="small"
-                                            value={searchTermsColumnWise[column.id]} // Bind input value
-                                            onChange={(e) => handleSearchColumnWise(column.id, e)} // Handle change
-                                            InputProps={{
-                                                startAdornment: (
-                                                    <InputAdornment position="start">
-                                                        <Search fontSize="small" />
-                                                    </InputAdornment>
-                                                ),
-                                            }}
-                                            fullWidth
-                                        />
-                                    </MenuItem>
-                                ))}
-
+                                <div style={{display: "flex", }}>
+                                    {columns.map((column) => (
+                                        <MenuItem key={column.id} dense>
+                                            <TextField style={{border: "1px solid red"}}
+                                                placeholder={`Search ${column.label}`}
+                                                variant="outlined"
+                                                size="small"
+                                                value={searchTermsColumnWise[column.id]} // Bind input value
+                                                onChange={(e) => handleSearchColumnWise(column.id, e)} // Handle change
+                                                InputProps={{
+                                                    startAdornment: (
+                                                        <InputAdornment position="start">
+                                                            <Search fontSize="small" />
+                                                        </InputAdornment>
+                                                    ),
+                                                }}
+                                                fullWidth
+                                            />
+                                        </MenuItem>
+                                    ))}
+                                </div>
                             </Popover>
 
                             {/* Export Button */}

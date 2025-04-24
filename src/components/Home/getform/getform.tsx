@@ -492,14 +492,13 @@ export default function VerticalLinearStepper() {
                                         Step {activeStep + 1}: {steps[activeStep]}
                                     </Typography>
 
-                                    <Typography sx={{ mt: 1, mb: 3 }}>
+                                    <Typography sx={{ mt: 1, mb: 3 }} component="div">
                                         <div className="col-md-10">
                                             <div className="tab-content">
                                                 {section
                                                     .filter((_, index) => index === activeStep) // 👈 Only show the active section
                                                     .map((section, sectionIndex) => (
                                                         <div key={sectionIndex} className="mb-4">
-                                                            {/* <h5>{section.sectionName}</h5> */}
 
                                                             {section.attributes.map((attr: {
                                                                 id: string | number;

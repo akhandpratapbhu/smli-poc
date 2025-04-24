@@ -356,9 +356,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                         }}
                     >
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                            {/* <Typography variant="h6" component="h1" sx={{ fontWeight: 500 }}>
-            Spare-spare part sale Invoice
-            </Typography> */}
+                          
                             <TextField
                                 size="small"
                                 placeholder="Search"
@@ -465,7 +463,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                                     sx: { p: 2, width: 650 },
                                 }}
                             >
-                                <Typography variant="subtitle2" sx={{ mb: 1 }}>
+                                <Typography variant="subtitle2" sx={{ mb: 1 }} component="div">
                                     filter Columns-wise
                                 </Typography>
                                 {columns.map((column) => (

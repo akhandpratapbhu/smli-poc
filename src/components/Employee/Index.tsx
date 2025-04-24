@@ -624,13 +624,7 @@ const EntityForm = () => {
                         <button
                           className={`list-group-item ${activeSectionId === section.id ? "active" : ""}`}
                           onClick={() => getSection(section.id)}
-                          style={{
-                            textTransform: "uppercase",
-                            fontSize: "14px",
-                            padding: "5px 7px",
-                            backgroundColor: "#198754",
-                            borderColor: "#198754"
-                          }}
+                        
                         >
                           {section.sectionName}
                         </button>

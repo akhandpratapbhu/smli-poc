@@ -1,0 +1,139 @@
+.dealer-master-container {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  max-width: 100%;
+  margin: 0;
+  padding: 30px;
+  background: #f0f2f5;
+}
+
+h1 {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  color: #2c3e50;
+}
+
+.form-container {
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.form-section h2 {
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  padding: 20px;
+  background: #007bff;
+  color: white;
+}
+
+.form-tabs {
+  display: flex;
+  border-bottom: 2px solid #f0f0f0;
+  background: #f9f9f9;
+}
+
+.tab {
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  color: #333;
+}
+
+.tab:hover {
+  background: #e9ecef;
+}
+
+.tab.active {
+  background-color: #ffffff;
+  border-bottom: 3px solid #007bff;
+  color: #007bff;
+}
+
+.form-fields {
+  padding: 30px 25px 20px;
+}
+
+.form-group {
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+}
+
+input,
+select {
+  padding: 10px 14px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  width: 100%;
+  transition: border-color 0.3s;
+}
+
+input:focus,
+select:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.button-group {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 0 25px 25px;
+}
+
+.btn {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-save {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #218838;
+}
+
+.draggable-field {
+  background: #f4f4f4;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px dashed #ccc;
+  margin-bottom: 10px;
+  cursor: move;
+}
+
+.draggable-field:hover {
+  background: #ebebeb;
+}
+.form-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+}

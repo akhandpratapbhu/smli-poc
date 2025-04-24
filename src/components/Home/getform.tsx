@@ -267,66 +267,67 @@ export default function VerticalLinearStepper() {
         attrId: string
     ) => {
         const { name, value } = e.target;
-
+    
         // Update form values for this specific grid (by attrId)
-        setGridFormValues(prev => ({
-            ...prev,
-            [attrId]: {
-                ...prev[attrId],
-                [name]: value
-            }
-        }));
-
-        const selectedPart = autocompleteData.find(item => item.partno === value);
-        console.log("selectedPartcheck", selectedPart, attrId, section);
-        console.log("section", section);
-        const gridElements = section
-            .flatMap(sec =>
+        setGridFormValues(prev => {
+            // Merge previous grid form values with the updated value
+            const updatedGridFormValues = {
+                ...prev,
+                [attrId]: {}
+            };
+            // setGridFormValues(prev => ({
+            //     ...prev,
+            //     [attrId]: {}
+            // }));
+            const selectedPart = autocompleteData.find(item => item.partno === value);
+            console.log("selectedPartcheck", selectedPart, attrId, section);
+    
+            const gridElements = section
+                .flatMap(sec =>
+                    sec.attributes
+                        .filter((attr: { dataType: string; gridMaster: { gridElements: any; }; }) => attr.dataType === 'grid' && attr.gridMaster?.gridElements)
+                        .flatMap((attr: { gridMaster: { gridElements: any; }; }) => attr.gridMaster.gridElements)
+                );
+    
+            console.log("gridElements", gridElements);
+            const cleanedFieldsMap: Record<string, string[]> = {};
+    
+            section.forEach(sec => {
                 sec.attributes
                     .filter((attr: { dataType: string; gridMaster: { gridElements: any; }; }) => attr.dataType === 'grid' && attr.gridMaster?.gridElements)
-                    .flatMap((attr: { gridMaster: { gridElements: any; }; }) => attr.gridMaster.gridElements)
-            );
-
-        console.log("gridElements", gridElements);
-        const cleanedFieldsMap: Record<string, string[]> = {};
-
-        section.forEach(sec => {
-            sec.attributes
-                .filter((attr: { dataType: string; gridMaster: { gridElements: any; }; }) => attr.dataType === 'grid' && attr.gridMaster?.gridElements)
-                .forEach((attr: { id: string; gridMaster: { gridElements: any[]; }; }) => {
-                    const fieldGroup = attr.gridMaster.gridElements.flatMap(el =>
-                        el.valueField.map((field: string) => field.split('_')[1])
-                    );
-                    cleanedFieldsMap[attr.id] = fieldGroup;
-                });
-        });
-
-        console.log("cleanedFieldsMap", cleanedFieldsMap);
-
-        if (selectedPart && cleanedFieldsMap[attrId]) {
-            const fieldGroup = cleanedFieldsMap[attrId];
-
-            const updated = fieldGroup.reduce((acc: any, field: string) => {
-                if (field in selectedPart) {
-                    acc[field] = selectedPart[field];
-                }
-                return acc;
-            }, {});
-
-            setGridFormValues(prev => ({
-                ...prev,
-                [attrId]: {
-                    ...prev[attrId],
+                    .forEach((attr: { id: string; gridMaster: { gridElements: any[]; }; }) => {
+                        const fieldGroup = attr.gridMaster.gridElements.flatMap(el =>
+                            el.valueField.map((field: string) => field.split('_')[1])
+                        );
+                        cleanedFieldsMap[attr.id] = fieldGroup;
+                    });
+            });
+    
+            console.log("cleanedFieldsMap", cleanedFieldsMap);
+    
+            if (selectedPart && cleanedFieldsMap[attrId]) {
+                const fieldGroup = cleanedFieldsMap[attrId];
+    
+                const updated = fieldGroup.reduce((acc: any, field: string) => {
+                    if (field in selectedPart) {
+                        acc[field] = selectedPart[field];
+                    }
+                    return acc;
+                }, {});
+    
+                // Merge the selected part data into the previous state (same as before)
+                updatedGridFormValues[attrId] = {
+                    ...updatedGridFormValues[attrId],
                     ...updated
-                }
-            }));
-        }
-
-
-
-
+                };
+            }
+    
+            return updatedGridFormValues;
+        });
+    
+        console.log("selectedPartcheckafter", gridFormValues);
     };
-    console.log("selectedPartcheckaftergbbgb", gridFormValues);
+    
     const handleGridInputChange = (
         e: React.ChangeEvent<HTMLInputElement>,
         attrId: string
@@ -353,19 +354,27 @@ export default function VerticalLinearStepper() {
     // console.log(formValues);
     const handleAddRow = (attrId: string) => {
         const currentForm = gridFormValues[attrId] || {};
-        console.log("handleAddRow", currentForm);
-
+    
+        // Always assign ID as "0" for a newly added row
+        const newRow: Record<string, string> = {
+            ID: "0",
+            ...currentForm
+        };
+    
         setGridSubmittedRows(prev => ({
             ...prev,
-            [attrId]: [...(prev[attrId] || []), currentForm]
+            [attrId]: [...(prev[attrId] || []), newRow]
         }));
-
-        // Reset grid input fields
+    
+        // Clear the form after adding
         setGridFormValues(prev => ({
             ...prev,
             [attrId]: {}
         }));
     };
+    
+    
+    
     const handleDeleteRow = (attrId: string, indexToDelete: number) => {
         setGridSubmittedRows(prev => ({
             ...prev,

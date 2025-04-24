@@ -338,6 +338,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
             </div>
             <div className="card" style={{
                 display: "flex",
+                
                 justifyContent: "space-between",
                 alignItems: "center",
                 backgroundColor: "#f5f5f5", // light gray card background

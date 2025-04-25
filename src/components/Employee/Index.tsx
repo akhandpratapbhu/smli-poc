@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
 import PartialForm from "./PartialForm";
+import { all } from "axios";
 
 interface AttributeofPartialFormData {
   gridMaster: any;
@@ -28,6 +29,68 @@ const EntityForm = () => {
   const model = location.state?.entityData; // Get the passed data
   const [sections, setSections] = useState<Section[]>([]);
   const [masters, setMasters] = useState([]);
+  const [selectedEntity, setSelectedEntity] = useState("");
+  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
+  const [allcolumndata, setallcolumndata] = useState<Record<string, string[]>>({});
+  const [activeTab, setActiveTab] = useState<number | undefined>(undefined);
+  const [itemName, setitemName] = useState("");
+  const [droppedLocation, setDroppedLocation] = useState<"form" | "table" | null>(null);
+
+  // State to store form data
+  const [formData, setFormData] = useState({
+    fieldType: "",
+    fieldName: "",
+    fieldLabel: "",
+    isDependent: false,
+    dependentField: "",
+    isRequired: false,
+    defaultValue: "",
+    mastersource: "",
+    valuefield: ""
+  });
+  const [getAttributeData, setGetAttributeData] = useState([]);
+  const [sectionName, setSectionName] = useState("");
+
+  const [showFieldModal, setShowFieldModal] = useState(false);
+  const [ShowaddpartfieldFieldModal, setShowaddpartfieldFieldModal] = useState(false);
+
+  const [showSectionModal, setShowSectionModal] = useState(false);
+  const [showDependentField, setShowDependentField] = useState(false);
+  const [showDefaultValue, setShowDefaultValue] = useState(false);
+  const [tableCustomFields, setTableCustomFields] = useState<any[]>([]);
+  const [activeSectionId, setActiveSectionId] = useState<null | undefined | number>(sections[0]?.id);
+  const [sectionAttributes, setSectionAttributes] = useState<{
+    [key: string]: { id: number; label: string }[];
+  }>({
+    activeSectionId: [],
+  });
+
+  const [sectionAttributestabularForm, setsectionAttributestabularForm] = useState<{
+    [key: string]: { id: number; label: string }[];
+  }>({
+    activeSectionId: [],
+  });
+  const [attributesofPartialFormData, setAttributesofPartialFormData] = useState<AttributeofPartialFormData[]>([]);
+  const [fieldAllAttributes, setFieldAllAttributes] = useState<
+    {
+      id: number;
+      label: string;
+      name: string;
+      datatype: string;
+      mastersource: string;
+      valuefield: string;
+      isrequired: boolean;
+      defaultvalue: string;
+      isdependent: boolean;
+      dependentfield: string;
+      sortOrder: number;
+    }[]
+  >([]);
+  const [allcolumndataWithName, setAllcolumndataWithName] = useState<{
+    [sectionId: number]: {
+      [entityName: string]: string[];
+    };
+  }>({});
   useEffect(() => {
     getSectionAllData();
     getAllMasterData();
@@ -45,7 +108,6 @@ const EntityForm = () => {
       .then((data) => setMasters(data))
       .catch((error) => console.error("Error fetching entities:", error));
   }
-  const [activeTab, setActiveTab] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     if (sections.length > 0) {
@@ -58,20 +120,7 @@ const EntityForm = () => {
       getSection(sections[0].id);
     }
   }, [sections]); // Runs when `sections` are updated
-  const [itemName, setitemName] = useState("");
-  // State to store form data
-  const [formData, setFormData] = useState({
-    fieldType: "",
-    fieldName: "",
-    fieldLabel: "",
-    isDependent: false,
-    dependentField: "",
-    isRequired: false,
-    defaultValue: "",
-    mastersource: "",
-    valuefield: ""
-  });
-  const [getAttributeData, setGetAttributeData] = useState([]);
+
   function getAttribute(master: any) {
 
     fetch(`${baseUrl}/employee/GetAttributes?masterId=${master.id}`)
@@ -86,14 +135,9 @@ const EntityForm = () => {
     if (name === "mastersource" && selectedMaster) {
       getAttribute(selectedMaster);
     }
-
-
-
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const [showDependentField, setShowDependentField] = useState(false);
-  const [showDefaultValue, setShowDefaultValue] = useState(false);
 
 
   // Handle dependent field dropdown change
@@ -113,29 +157,6 @@ const EntityForm = () => {
     // Show default value input if "Yes" is selected
     setShowDefaultValue(value);
   };
-  //const [attributes, setAttributes] = useState(model.Attributes || []);
-  const [sectionName, setSectionName] = useState("");
-
-  const [showFieldModal, setShowFieldModal] = useState(false);
-  const [ShowaddpartfieldFieldModal, setShowaddpartfieldFieldModal] = useState(false);
-
-  const [showSectionModal, setShowSectionModal] = useState(false);
-
-  const [fieldAllAttributes, setFieldAllAttributes] = useState<
-    {
-      id: number;
-      label: string;
-      name: string;
-      datatype: string;
-      mastersource: string;
-      valuefield: string;
-      isrequired: boolean;
-      defaultvalue: string;
-      isdependent: boolean;
-      dependentfield: string;
-      sortOrder: number;
-    }[]
-  >([]);
 
 
   const handleDragStart = (event: React.DragEvent<HTMLLIElement>, item: string) => {
@@ -147,7 +168,6 @@ const EntityForm = () => {
     }));
   };
 
-  const [droppedLocation, setDroppedLocation] = useState<"form" | "table" | null>(null);
 
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -171,19 +191,6 @@ const EntityForm = () => {
   };
 
 
-  const [activeSectionId, setActiveSectionId] = useState<null | undefined | number>(sections[0]?.id);
-  const [sectionAttributes, setSectionAttributes] = useState<{
-    [key: string]: { id: number; label: string }[];
-  }>({
-    activeSectionId: [],
-  });
-
-  const [sectionAttributestabularForm, setsectionAttributestabularForm] = useState<{
-    [key: string]: { id: number; label: string }[];
-  }>({
-    activeSectionId: [],
-  });
-  const [attributesofPartialFormData, setAttributesofPartialFormData] = useState<AttributeofPartialFormData[]>([]);
   const getSection = async (sId: React.Key | null | undefined) => {
     setActiveSectionId((prev) => {
       const newId = sId as number;
@@ -228,6 +235,11 @@ const EntityForm = () => {
       mastersource: "",
       valuefield: ""
     })
+    setSelectedEntity("");
+    setSelectedColumns([]);
+    setGetAttributeData([]);
+    setitemName("");
+    setDroppedLocation(null);
   };
   const handleCloseSectionModal = () => setShowSectionModal(false);
 
@@ -256,7 +268,6 @@ const EntityForm = () => {
     }
     handleCloseSectionModal();
   };
-  const [tableCustomFields, setTableCustomFields] = useState<any[]>([]);
 
   const saveField = () => {
 
@@ -322,12 +333,8 @@ const EntityForm = () => {
     }
 
     handleCloseFieldModal();
-    setDroppedLocation(null); // Reset drop location
   };
 
-  const [selectedEntity, setSelectedEntity] = useState("");
-  const [selectedColumns, setSelectedColumns] = useState<string[]>([]);
-  const [allcolumndata, setallcolumndata] = useState<Record<string, string[]>>({});
   const handleEntityChange = (e: React.ChangeEvent<any>) => {
     const { name, value } = e.target;
     // Reset selected checkboxes
@@ -339,11 +346,7 @@ const EntityForm = () => {
     setSelectedEntity(value)
   };
 
-  const [allcolumndataWithName, setAllcolumndataWithName] = useState<{
-    [sectionId: number]: {
-      [entityName: string]: string[];
-    };
-  }>({});
+
 
   const handleSubmittablecolumn = (e: React.FormEvent) => {
     e.preventDefault();
@@ -381,6 +384,8 @@ const EntityForm = () => {
     }));
 
     setShowaddpartfieldFieldModal(false);
+    handleCloseFieldModal();
+
   };
 
   const formAttributes = attributesofPartialFormData.filter(attr => attr.dataType !== 'grid');
@@ -453,14 +458,19 @@ const EntityForm = () => {
 
       if (hasGridData) {
         updatedformsection = [...fieldAllAttributes, finalgrid];
+
       } else {
         updatedformsection = [...fieldAllAttributes];
+
       }
     }
-    else if (finalgrid && !fieldAllAttributes) {
-      updatedformsection = [finalgrid];
-    } else {
-      updatedformsection = [...fieldAllAttributes, finalgrid];
+    else if (finalgrid && fieldAllAttributes.length<=0) {
+      const hasGridData = finalgrid.gridMaster.gridElements.length > 0;
+
+      if (hasGridData) {
+        updatedformsection = [ finalgrid];
+
+      }
     }
 
     // Case 2: Only grid attributes are present
@@ -496,7 +506,46 @@ const EntityForm = () => {
       updatedGridAttributes
     ];
   }
+  const handleDeleteEntity = (entity: string) => {
+    // Remove from ID-based data
+    setallcolumndata(prev => {
+      const updated = { ...prev };
+      delete updated[entity];
+      return updated;
+    });
 
+    // Remove from Name-based section data
+    setAllcolumndataWithName(prev => {
+      const updatedSectionData = { ...prev[activeSectionId || 0] };
+      delete updatedSectionData[entity];
+
+      return {
+        ...prev,
+        [activeSectionId || 0]: updatedSectionData,
+      };
+    });
+  };
+  const handleRemoveSectionField = (indexToRemove: number) => {
+    const sectionId = activeSectionId || 0;
+
+    setSectionAttributes(prev => {
+      const updatedSection = [...(prev[sectionId] || [])];
+      const [removedField] = updatedSection.splice(indexToRemove, 1); // Store removed
+
+      // Also remove from fieldAllAttributes
+      setFieldAllAttributes(prevFields =>
+        prevFields.filter(field => field.label !== removedField.label)
+      );
+
+      return {
+        ...prev,
+        [sectionId]: updatedSection,
+      };
+    });
+  };
+
+
+console.log("updatedformsection",updatedformsection);
 
   const saveForm = async () => {
     const currentSectionId = activeSectionId; // ✅ Save current section ID before resetting
@@ -523,6 +572,7 @@ const EntityForm = () => {
 
       const result = await response.json();
       console.log("Success:", result);
+      alert("section Form submitted successfully!");
 
       setFieldAllAttributes([]);
       setSectionAttributes(prev => ({
@@ -537,6 +587,17 @@ const EntityForm = () => {
       setAllcolumndataWithName({});
       setTableCustomFields([]);
       getSection(String(activeSectionId))
+        // Find current index and move to next
+    const currentIndex = sections.findIndex(s => s.id === currentSectionId);
+    if (currentIndex !== -1 && currentIndex + 1 < sections.length) {
+      // Go to next section
+      const nextSectionId = sections[currentIndex + 1].id;
+      setActiveSectionId(nextSectionId); // Optional if needed
+      getSection(nextSectionId);
+    } else {
+      // No more sections, redirect
+      window.location.href = "/";
+    }
     } catch (error) {
       console.error("Error posting data:", error);
     }
@@ -556,7 +617,7 @@ const EntityForm = () => {
       <div className="container mt-4">
         <h3>{model.label}</h3>
         <input id="EntityId" type="hidden" value={model.id} />
-        <input id="EntityName" type="hidden" value={model.name}/>
+        <input id="EntityName" type="hidden" value={model.name} />
         <input id="SectionId" type="hidden" value={model.sectionId} />
 
         <div className="row border p-3 rounded" style={{ borderColor: "black" }}>
@@ -565,7 +626,7 @@ const EntityForm = () => {
               <div className="col-md-6">
                 <h5>Draggable Items</h5>
                 <ul className="list-group">
-                  {["String", "Number", "Dropdown","Date", "AddGrid"].map((item, index) => (
+                  {["String", "Number", "Dropdown", "Date", "AddGrid"].map((item, index) => (
                     <li
                       key={index}
                       className="list-group-item"
@@ -587,9 +648,9 @@ const EntityForm = () => {
                         <button
                           className={`list-group-item ${activeSectionId == section.id ? "active" : ""}`}
                           onClick={() => getSection(section.id)}
-                        
+
                         >
-                          <span style={{textTransform:'capitalize'}}>{section.sectionName}</span>
+                          <span style={{ textTransform: 'capitalize' }}>{section.sectionName}</span>
                         </button>
 
                       </div>
@@ -618,13 +679,23 @@ const EntityForm = () => {
                   <PartialForm attributes={formAttributes as any} />
 
                   {(sectionAttributes[activeSectionId || 0] || []).map((attr, index) => (
-                    <div key={index} className="row mb-2">
+                    <div key={index} className="row mb-2 align-items-center">
                       <div className="col-md-6">
                         <label>{attr.label}</label>
                         <input type="text" className="form-control" readOnly value={attr.label} />
                       </div>
+                      <div className="col-md-1">
+                        <button
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleRemoveSectionField(index)}
+                          title="Remove field"
+                        >
+                          &times;
+                        </button>
+                      </div>
                     </div>
                   ))}
+
 
                 </div>
 
@@ -652,7 +723,15 @@ const EntityForm = () => {
                   {/* Section-wise rendering of allcolumndataWithName */}
                   {Object.entries(allcolumndataWithName[activeSectionId || 0] || {}).map(([entity, columns]) => (
                     <div key={entity} className="mb-4">
-                      <h6>{entity}</h6>
+                      <div className="d-flex justify-content-between align-items-center">
+                        <h6>{entity}</h6>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteEntity(entity)}
+                        >
+                          Delete All
+                        </button>
+                      </div>
                       <table className="table table-bordered">
                         <thead>
                           <tr>
@@ -673,6 +752,7 @@ const EntityForm = () => {
                       </table>
                     </div>
                   ))}
+
                 </div>
 
 
@@ -681,7 +761,7 @@ const EntityForm = () => {
               <div className="text-center mt-3">
                 <button type="button" className="btn btn-secondary me-2" onClick={cancelForm}>Close</button>
                 <button type="button" className="btn btn-success" onClick={saveForm}
-                  disabled={fieldAllAttributes.length === 0 && Object.keys(allcolumndataWithName).length === 0 && tableCustomFields.length === 0}
+                  disabled={updatedformsection.length ==0}
                 >Save</button>
 
               </div>

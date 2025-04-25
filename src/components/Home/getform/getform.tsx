@@ -190,6 +190,7 @@ export default function VerticalLinearStepper() {
                         name: attr.name,
                         value: dynamicData?.[attr.name] ?? '',
                     };
+                fetchDropdownOptions(attr); // Await it here if it's async
                 }
             });
         });
@@ -207,12 +208,12 @@ export default function VerticalLinearStepper() {
 
         // Top row input values for each grid
         const initialFormValues: { [key: string]: any } = {};
-        gridsData?.forEach((gridItem: any) => {
-            if (gridItem.attributeId) {
-                const firstRow = gridItem.gridItems?.[0] ?? {};
-                initialFormValues[gridItem.attributeId] = { ...firstRow };
-            }
-        });
+        // gridsData?.forEach((gridItem: any) => {
+        //     if (gridItem.attributeId) {
+        //         const firstRow = gridItem.gridItems?.[0] ?? {};
+        //         initialFormValues[gridItem.attributeId] = { ...firstRow };
+        //     }
+        // });
         setGridFormValues(initialFormValues);
 
     }, [section, dynamicData, gridsData]);

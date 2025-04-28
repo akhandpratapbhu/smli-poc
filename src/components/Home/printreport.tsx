@@ -1,7 +1,6 @@
 export const generatePrintHTML = (rowData: any): string => {
   const dynamicData = rowData.dynamicItemDetail?.[0] || {};
   const gridItems = rowData.gridsData?.[0]?.gridItems || [];
-console.log("dynamicData",dynamicData,"gridItems",gridItems);
 const subtotal = gridItems.reduce((sum: number, item: { quantity: number; unitprice: number; }) => {
   const quantity = item.quantity || 0;
   const unitprice = item.unitprice || 0;

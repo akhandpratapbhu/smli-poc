@@ -103,14 +103,21 @@ const MaterialTableFormData = () => {
   // Define state with a type
   const [entities, setEntities] = useState<Entity[]>([]);
 
-  useEffect(() => {
-
+    useEffect(() => {
+      fetch(`${baseUrl}/Home/Index`)
+        .then((response) => response.json())
+        .then((data) => setEntities(data))
+        .catch((error) => console.error("Error fetching entities:", error));
+    }, []);  // Empty dependency array to call once when component mounts
+  
+  const getAllMasters = () => {
+    // Fetch data and update state when called    
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
       .then((data) => setEntities(data))
       .catch((error) => console.error("Error fetching entities:", error));
-  }, []);
-
+  };
+  
   const editRow = (entity: any) => {
     navigate(`/employee/index/${entity.id}`, { state: { entityData: entity } });
   };
@@ -145,7 +152,6 @@ const MaterialTableFormData = () => {
       id: String(0),
       formName: newMasterName,
     }
-    console.log(requestBody);
 
     try {
       const response = await fetch(`${baseUrl}/employee/InsertMaster`, {
@@ -162,11 +168,12 @@ const MaterialTableFormData = () => {
 
       const result = await response.json();
       console.log("Success:", result);
-      // Update sections state to trigger useEffect
-      // getSectionAllData()
+      alert("Create New Master successfully!");
+     
     } catch (error) {
       console.error("Error posting data:", error);
     }
+    getAllMasters()
     handleCloseNewMasterModal();
   };
 
@@ -183,12 +190,6 @@ const MaterialTableFormData = () => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value.toLowerCase());
   };
-
-  // const filteredData = mockData.filter((item) =>
-  //   Object.values(item).some((value) =>
-  //     String(value).toLowerCase().includes(searchTerm)
-  //   )
-  // );
 
   const handleClick = (event: MouseEvent<HTMLTableRowElement>, id: number) => {
     console.log(event);
@@ -284,10 +285,6 @@ const MaterialTableFormData = () => {
     setIsPopupOpen(false);
     setSelectedRow(null);
   };
-  console.log('entities:', entities);
-  console.log('filteredData:', filteredData);
-  console.log('sortedData:', sortedData);
-
   return (
     <>
       <div style={{ display: "flex", justifyContent: "flex-end", marginTop: '30px' }}>

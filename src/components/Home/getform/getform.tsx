@@ -142,20 +142,6 @@ export default function VerticalLinearStepper() {
             setSteps(defaultSteps);
         }
     }, [section]);
-
-    // const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>, attr: any) => {
-    //     const { value } = e.target;
-    //     console.log("intstringchangefield", attr.name, value);
-
-    //     setFormData(prev => ({
-    //         ...prev,
-    //         [attr.id]: {
-    //             ...prev[attr.id],
-    //             name: attr.name,
-    //             value: value,
-    //         },
-    //     }));
-    // };
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
         attr: { id: number | string }
@@ -267,7 +253,6 @@ export default function VerticalLinearStepper() {
         attrId: string
     ) => {
         const { name, value } = e.target;
-        console.log(name, value);
         fetchAutocompleteData(value);
         // Update form values for this specific grid (by attrId)
         setGridFormValues(prev => {

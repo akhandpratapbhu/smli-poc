@@ -29,7 +29,6 @@ const MaterialCardFormData = () => {
   const navigate = useNavigate();
   const [entities, setEntities] = useState<Entity[]>([]);
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-console.log(baseUrl);
   useEffect(() => {
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())

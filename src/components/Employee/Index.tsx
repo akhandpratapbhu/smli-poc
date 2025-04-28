@@ -562,8 +562,6 @@ const EntityForm = () => {
     });
   };
 
-console.log("updatedformsection",updatedformsection);
-
   const saveForm = async () => {
     const currentSectionId = activeSectionId; // ✅ Save current section ID before resetting
 

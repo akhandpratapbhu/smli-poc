@@ -45,3 +45,57 @@
   /* overflow: hidden; */
   padding: 16px;
 }
+
+/* Dialog styling */
+.dialogContent {
+  padding: 16px;  /* Extra space inside the dialog */
+  max-width: 400px; /* Limit dialog width */
+  background-color: #f4f4f9; /* Light background for contrast */
+}
+
+/* List styling inside Dialog */
+.MuiList-root {
+  padding: 0;  /* Remove default padding from list */
+}
+
+/* ListItem styling */
+.MuiListItem-root {
+  background-color: #fff;  /* White background for list items */
+  border-radius: 4px; /* Rounded corners for a softer look */
+  margin: 8px 0; /* Margin between list items */
+  transition: all 0.3s ease;  /* Smooth transition */
+}
+
+/* Hover effect on list item */
+.MuiListItem-root:hover {
+  background-color: #e3f2fd;  /* Light blue when hovering */
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);  /* Subtle shadow */
+}
+
+/* Active item effect */
+.Mui-selected {
+  background-color: #4caf50; /* Green when selected */
+  color: white;
+  font-weight: bold;
+}
+
+/* ListItemButton padding */
+.MuiListItemButton-root {
+  padding: 12px 16px; /* Adequate padding for better click area */
+  font-size: 16px; /* Text size for readability */
+}
+
+/* Dialog title styling */
+.MuiDialogTitle-root {
+  background-color: #2196f3;  /* Blue background */
+  color: white;  /* White text */
+  text-align: center; /* Center align the title */
+  padding: 16px;  /* Padding around the title */
+  border-radius: 4px 4px 0 0;  /* Rounded top corners */
+}
+
+/* Adjust list item text */
+.MuiListItemText-primary {
+  font-size: 14px; /* Make the text a little smaller */
+  font-weight: 600; /* Bold primary text for better visibility */
+}

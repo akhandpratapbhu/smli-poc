@@ -35,8 +35,9 @@ import { Search, KeyboardArrowDown, FilterList, TableRows, FileDownload } from "
 import { useLocation, useNavigate } from "react-router-dom";
 import * as XLSX from "xlsx"; // Excel library
 import jsPDF from "jspdf"; // PDF library
-import { generatePrintHTML } from "./printreport";
+import { generatePrintHTML } from "../printreport";
 import axios from "axios";
+import './getform.css';
 interface SpareData {
     id: string;
     invoiceNo: string;
@@ -155,7 +156,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
 
     const handleClick = (event: MouseEvent<HTMLTableRowElement>, id: string) => {
         console.log(event);
-        
+
         const selectedIndex = selected.indexOf(id);
         let newSelected: string[] = [];
 
@@ -179,8 +180,8 @@ const SparePartSaleInvoiceTable: React.FC = () => {
     const isSelected = (id: string) => selected.includes(id);
 
     const handleChangePage = (event: unknown, newPage: number) => {
-        console.log("event",event);
-        
+        console.log("event", event);
+
         setPage(newPage);
     };
 
@@ -283,29 +284,29 @@ const SparePartSaleInvoiceTable: React.FC = () => {
     const [dynamicPrintAllData, setDynamicPrintAllData] = useState<any>({});
     const handlePrintAllData = (selectedRow: any) => {
         axios
-          .get(`${baseUrl}/spare/GetItemDetail?ScreenId=${model.id}&ItemId=${selectedRow.ID}`)
-          .then((res) => {
-            const data = res.data;
-            setDynamicPrintAllData(data); // still update state if needed elsewhere
-      
-            const htmlContent = generatePrintHTML(data); // use fresh data directly
-            const printWindow = window.open('', '_blank');
-            if (printWindow) {
-              printWindow.document.open();
-              printWindow.document.write(htmlContent);
-              printWindow.document.close();
-              printWindow.focus();
-              printWindow.print();
-            }
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-          });
-      };
-          
+            .get(`${baseUrl}/spare/GetItemDetail?ScreenId=${model.id}&ItemId=${selectedRow.ID}`)
+            .then((res) => {
+                const data = res.data;
+                setDynamicPrintAllData(data); // still update state if needed elsewhere
+
+                const htmlContent = generatePrintHTML(data); // use fresh data directly
+                const printWindow = window.open('', '_blank');
+                if (printWindow) {
+                    printWindow.document.open();
+                    printWindow.document.write(htmlContent);
+                    printWindow.document.close();
+                    printWindow.focus();
+                    printWindow.print();
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching data:", error);
+            });
+    };
+
     const handleAction = (type: "view" | "edit" | "print" | "cancel") => {
         if (!selectedRow) return;
-        
+
         switch (type) {
             case "view":
                 handleViewRoutePage(selectedRow)
@@ -316,13 +317,13 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                 break;
 
             case "print":
-                    handlePrintAllData(selectedRow); // everything handled inside now
-                    break;
-                  
+                handlePrintAllData(selectedRow); // everything handled inside now
+                break;
+
 
             case "cancel":
                 break;
-         
+
         }
     };
     return (
@@ -338,7 +339,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
             </div>
             <div className="card" style={{
                 display: "flex",
-                
+
                 justifyContent: "space-between",
                 alignItems: "center",
                 backgroundColor: "#f5f5f5", // light gray card background
@@ -357,7 +358,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                         }}
                     >
                         <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                          
+
                             <TextField
                                 size="small"
                                 placeholder="Search"
@@ -467,15 +468,15 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                                 <Typography variant="subtitle2" sx={{ mb: 1 }}>
                                     Filters
                                 </Typography>
-                                <div style={{display: "flex", }}>
+                                <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", padding: "8px" }}>
                                     {columns.map((column) => (
-                                        <MenuItem key={column.id} dense>
-                                            <TextField style={{border: "1px solid red"}}
+                                        <MenuItem key={column.id} dense style={{ flex: "1 1 200px" }}>
+                                            <TextField
                                                 placeholder={`Search ${column.label}`}
                                                 variant="outlined"
                                                 size="small"
-                                                value={searchTermsColumnWise[column.id]} // Bind input value
-                                                onChange={(e) => handleSearchColumnWise(column.id, e)} // Handle change
+                                                value={searchTermsColumnWise[column.id]}
+                                                onChange={(e) => handleSearchColumnWise(column.id, e)}
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start">
@@ -504,21 +505,22 @@ const SparePartSaleInvoiceTable: React.FC = () => {
 
                             {/* Dialog Popup */}
                             <Dialog open={open} onClose={() => setOpen(false)}>
-                                <DialogTitle>Select Export Format</DialogTitle>
-                                <DialogContent>
+                                <DialogTitle className="MuiDialogTitle-root">Select Export Format</DialogTitle>
+                                <DialogContent className="dialogContent">
                                     <List>
-                                        <ListItem disablePadding>
-                                            <ListItemButton onClick={exportAsPDF}>
-                                                <ListItemText primary="Export as PDF" />
+                                        <ListItem disablePadding className="MuiListItem-root">
+                                            <ListItemButton onClick={exportAsPDF} className="MuiListItemButton-root">
+                                                <ListItemText primary="Export as PDF" className="MuiListItemText-primary" />
                                             </ListItemButton>
                                         </ListItem>
-                                        <ListItem disablePadding>
-                                            <ListItemButton onClick={exportAsExcel}>
-                                                <ListItemText primary="Export as Excel" />
+                                        <ListItem disablePadding className="MuiListItem-root">
+                                            <ListItemButton onClick={exportAsExcel} className="MuiListItemButton-root">
+                                                <ListItemText primary="Export as Excel" className="MuiListItemText-primary" />
                                             </ListItemButton>
                                         </ListItem>
                                     </List>
                                 </DialogContent>
+
                                 <DialogActions>
                                     <Button onClick={() => setOpen(false)} color="primary">Cancel</Button>
                                 </DialogActions>
@@ -526,7 +528,7 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                         </Box>
                     </Box>
 
-                    <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 180px)" }}>
+                    <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 280px)" }}>
                         <Table stickyHeader size="small">
                             {columns.some(col => col.visible) && (
                                 <TableHead>

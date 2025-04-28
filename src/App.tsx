@@ -1,12 +1,12 @@
 
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import MaterialTableFormData from "../src/components/Home/Index";
+import MaterialTableFormData from "./components/Home/masters/Index";
 import Navbar from "../src/components/Home/Navbar";
 import EIndex from "../src/components/Employee/Index";
 import "bootstrap/dist/css/bootstrap.min.css";
 import 'bootstrap/dist/js/bootstrap.bundle.min'; 
-import SparePartSaleInvoiceTable from './components/Home/griddata'
+import SparePartSaleInvoiceTable from './components/Home/getform/griddata'
 import Sidebar from './components/Home/sidebar/sidebar'
 import VerticalLinearStepper from './components/Home/getform/getform'
 import MaterialCardFormData from "./components/Home/AllFormsList";

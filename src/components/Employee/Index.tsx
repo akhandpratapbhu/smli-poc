@@ -543,7 +543,24 @@ const EntityForm = () => {
       };
     });
   };
+  const handleRemovesectionAttributestabularForm = (indexToRemove: number) => {
+    const sectionId = activeSectionId || 0;
 
+    setsectionAttributestabularForm(prev => {
+      const updatedSection = [...(prev[sectionId] || [])];
+      const [removedField] = updatedSection.splice(indexToRemove, 1); // Store removed
+
+      // Also remove from customfieldAllAttributesintable
+      setTableCustomFields(prevFields =>
+        prevFields.filter(field => field.label !== removedField.label)
+      );
+
+      return {
+        ...prev,
+        [sectionId]: updatedSection,
+      };
+    });
+  };
 
 console.log("updatedformsection",updatedformsection);
 
@@ -620,7 +637,9 @@ console.log("updatedformsection",updatedformsection);
         <input id="EntityName" type="hidden" value={model.name} />
         <input id="SectionId" type="hidden" value={model.sectionId} />
 
-        <div className="row border p-3 rounded" style={{ borderColor: "black" }}>
+        <div className="row border p-3 rounded" style={{ borderColor: "black",
+         height: "600px", // Set your desired height
+         }}>
           <div className="col-md-4">
             <div className="row">
               <div className="col-md-6">
@@ -665,7 +684,10 @@ console.log("updatedformsection",updatedformsection);
           </div>
           <div className="col-md-8">
             <form>
-              <div className="border p-3 rounded" style={{ borderColor: "red" }}>
+              <div className="border p-3 rounded" style={{ borderColor: "red" ,
+                 maxHeight: "500px", // Set your desired height
+                  overflowY: "auto", // Enables vertical scrolling
+              }}>
 
                 {/* === FORM AREA === */}
                 <div
@@ -712,12 +734,21 @@ console.log("updatedformsection",updatedformsection);
 
                   {/* Render attributes dropped for table area for active section */}
                   {(sectionAttributestabularForm[activeSectionId || 0] || []).map((attr, index) => (
-                    <div key={index} className="row mb-2">
-                      <div className="col-md-6">
-                        <label>{attr.label}</label>
-                        <input type="text" className="form-control" readOnly value={attr.label} />
-                      </div>
-                    </div>
+                     <div key={index} className="row mb-2 align-items-center">
+                     <div className="col-md-6">
+                       <label>{attr.label}</label>
+                       <input type="text" className="form-control" readOnly value={attr.label} />
+                     </div>
+                     <div className="col-md-1">
+                       <button
+                         className="btn btn-sm btn-outline-danger"
+                         onClick={() => handleRemovesectionAttributestabularForm(index)}
+                         title="Remove field"
+                       >
+                         &times;
+                       </button>
+                     </div>
+                   </div>
                   ))}
 
                   {/* Section-wise rendering of allcolumndataWithName */}
@@ -729,7 +760,7 @@ console.log("updatedformsection",updatedformsection);
                           className="btn btn-danger btn-sm"
                           onClick={() => handleDeleteEntity(entity)}
                         >
-                          Delete All
+                          Delete 
                         </button>
                       </div>
                       <table className="table table-bordered">

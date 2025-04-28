@@ -172,8 +172,7 @@ const subtotal = gridItems.reduce((sum: number, item: { quantity: number; unitpr
 
         <div style="clear: both;"></div>
         <div class="footer">
-          Thank you for shopping with SmartStore!<br>
-          For support, contact support@smartstore.com
+      
         </div>
       </div>
     </body>

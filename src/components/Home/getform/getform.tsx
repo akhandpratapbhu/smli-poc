@@ -86,9 +86,9 @@ export default function VerticalLinearStepper() {
             .catch((error) => console.error("Error fetching entities:", error));
     }, [model]);
     // Fetch data from the API
-    const fetchAutocompleteData = async () => {
+    const fetchAutocompleteData = async (value: string) => {
         try {
-            const response = await fetch(`${baseUrl}/spare/GetPartMasterByPartNo?partno`);
+            const response = await fetch(`${baseUrl}/spare/GetPartMasterByPartNo?partno=${value}`);
             const data = await response.json();
             setAutocompleteData(data);
             setInputValues(data)
@@ -98,9 +98,9 @@ export default function VerticalLinearStepper() {
     };
 
     // Fetch data when component mounts
-    useEffect(() => {
-        fetchAutocompleteData();
-    }, []);
+    // useEffect(() => {
+    //     fetchAutocompleteData();
+    // }, []);
 
     const [attributes, setAttributes] = useState<any[]>([]);
     const [dynamicData, setDynamicData] = useState<any>({});
@@ -159,19 +159,19 @@ export default function VerticalLinearStepper() {
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement> | { target: { value: string } },
         attr: { id: number | string }
-      ) => {
+    ) => {
         const { value } = e.target;
         const key = String(attr.id);
-      
+
         setFormData(prev => ({
-          ...prev,
-          [key]: {
-            ...prev[key],
-            value,
-          },
+            ...prev,
+            [key]: {
+                ...prev[key],
+                value,
+            },
         }));
-      };
-      
+    };
+
     useEffect(() => {
         const initialData: any = {};
         section.forEach(sec => {
@@ -190,7 +190,10 @@ export default function VerticalLinearStepper() {
                         name: attr.name,
                         value: dynamicData?.[attr.name] ?? '',
                     };
-                fetchDropdownOptions(attr); // Await it here if it's async
+                    if(attr.dataType == 'Dropdown'){
+                        fetchDropdownOptions(attr); // Await it here if it's async
+
+                    }
                 }
             });
         });
@@ -264,7 +267,8 @@ export default function VerticalLinearStepper() {
         attrId: string
     ) => {
         const { name, value } = e.target;
-
+        console.log(name, value);
+        fetchAutocompleteData(value);
         // Update form values for this specific grid (by attrId)
         setGridFormValues(prev => {
             // Merge previous grid form values with the updated value
@@ -272,7 +276,13 @@ export default function VerticalLinearStepper() {
                 ...prev,
                 [attrId]: {}
             };
-          
+            setGridFormValues(prev => ({
+                ...prev,
+                [attrId]: {
+                    ...prev[attrId],
+                    [name]: value
+                }
+            }));
             const selectedPart = autocompleteData.find(item => item.partno === value);
             const cleanedFieldsMap: Record<string, string[]> = {};
 
@@ -416,7 +426,7 @@ export default function VerticalLinearStepper() {
                     formName: model?.label ?? 'sale-Invoice',
                     fieldsDataModel: completeData,
                 };
-          
+
 
             const response = await fetch(`${baseUrl}/employee/InsertFormData`, {
                 method: "POST",
@@ -476,7 +486,11 @@ export default function VerticalLinearStepper() {
 
                 {/* Form/Card Section */}
                 <Box sx={{ flexGrow: 1 }}>
-                    <Card sx={{ p: 2 }} style={{backgroundColor:"#ffff9" , overflow: "visible"}}>
+                    <Card sx={{ p: 2 }} style={{
+                        backgroundColor: "#ffff9", overflow: "visible",
+                        height: "600px",
+                        overflowY: "auto"
+                    }}>
                         <CardContent>
                             {activeStep === steps.length ? (
                                 <React.Fragment>
@@ -557,43 +571,42 @@ export default function VerticalLinearStepper() {
 
                                                                                                 return (
                                                                                                     <React.Fragment key={`field-${index}`}>
-                                                                                                    <td>
-                                                                                                        {namePart === 'partno' ? (
-                                                                                                            <div>
+                                                                                                        <td>
+                                                                                                            {namePart == 'partno' ? (
+                                                                                                                <div>
+                                                                                                                    <input
+                                                                                                                        type="text"
+                                                                                                                        name={namePart}
+                                                                                                                        className="form-control"
+                                                                                                                        value={gridFormValues[attr.id]?.[namePart] || ''}
+                                                                                                                        onChange={(e) => handleInputChangedatagrid(e, String(attr.id))}
+                                                                                                                        placeholder={`Enter ${namePart}`}
+                                                                                                                        list={`autocomplete-${namePart}`}
+                                                                                                                    />
+                                                                                                                    <datalist id={`autocomplete-${namePart}`}>
+                                                                                                                        {autocompleteData
+                                                                                                                            .filter(item =>
+                                                                                                                                item.partno.toLowerCase().includes((gridFormValues[attr.id]?.[namePart] || '').toLowerCase())
+                                                                                                                            )
+                                                                                                                            .map(item => (
+                                                                                                                                <option key={item.ID} value={item.partno} />
+                                                                                                                            ))}
+                                                                                                                    </datalist>
+                                                                                                                </div>
+                                                                                                            ) : (
                                                                                                                 <input
                                                                                                                     type="text"
                                                                                                                     name={namePart}
                                                                                                                     className="form-control"
                                                                                                                     value={gridFormValues[attr.id]?.[namePart] || ''}
-                                                                                                                    onChange={(e) => handleInputChangedatagrid(e, String(attr.id))}
+                                                                                                                    onChange={(e) => handleGridInputChange(e, String(attr.id))}
                                                                                                                     placeholder={`Enter ${namePart}`}
-                                                                                                                    list={`autocomplete-${namePart}`}
                                                                                                                 />
-                                                                                                                <datalist id={`autocomplete-${namePart}`}>
-                                                                                                                    {autocompleteData
-                                                                                                                        .filter(item =>
-                                                                                                                            item.partno.toLowerCase().includes((inputValues[namePart] || '').toLowerCase())
-                                                                                                                        )
-                                                                                                                        .map(item => (
-                                                                                                                            <option key={item.ID} value={item.partno}>
-                                                                                                                                {item.partdescription}
-                                                                                                                            </option>
-                                                                                                                        ))}
-                                                                                                                </datalist>
-                                                                                                            </div>
-                                                                                                        ) : (
-                                                                                                            <input
-                                                                                                                type="text"
-                                                                                                                name={namePart}
-                                                                                                                className="form-control"
-                                                                                                                value={gridFormValues[attr.id]?.[namePart] || ''}
-                                                                                                                onChange={(e) => handleGridInputChange(e, String(attr.id))}
-                                                                                                                placeholder={`Enter ${namePart}`}
-                                                                                                            />
-                                                                                                        )}
-                                                                                                    </td>
-                                                                                                </React.Fragment>
-                                                                                                
+                                                                                                            )}
+                                                                                                        </td>
+
+                                                                                                    </React.Fragment>
+
                                                                                                 );
                                                                                             })}
 
@@ -676,48 +689,48 @@ export default function VerticalLinearStepper() {
 
                                                                     ) : attr.dataType.toLowerCase() === "date" ? (
                                                                         <div style={{ position: "relative", width: "100%" }}>
-                                                                        <DatePicker
-                                                                          selected={
-                                                                            formData[String(attr.id)]?.value
-                                                                              ? new Date(formData[String(attr.id)].value)
-                                                                              : null
-                                                                          }
-                                                                          onChange={(date: Date | null) => {
-                                                                            if (date) {
-                                                                              handleChange({ target: { value: date.toISOString().split("T")[0] } }, attr);
-                                                                            } else {
-                                                                              handleChange({ target: { value: "" } }, attr);
-                                                                            }
-                                                                          }}
-                                                                          dateFormat="yyyy-MM-dd"
-                                                                          className="form-control"
-                                                                          showMonthDropdown
-                                                                          showYearDropdown
-                                                                          dropdownMode="select"
-                                                                        />
-                                                                        <i
-                                                                          className="fa fa-calendar"
-                                                                          style={{
-                                                                            position: "absolute",
-                                                                            right: "10px",
-                                                                            top: "50%",
-                                                                            transform: "translateY(-50%)",
-                                                                            pointerEvents: "none",
-                                                                            color: "#007bff", // blue
-                                                                            fontSize: "16px",
-                                                                          }}
-                                                                        ></i>
-                                                                      </div>
-                                                                      
-                                                                      )
-                                                                       : (
-                                                                        <input
-                                                                            type={attr.dataType.toLowerCase() === "int" ? "number" : "text"}
-                                                                            className="form-control"
-                                                                            value={formData[String(attr.id)]?.value || ""}
-                                                                            onChange={(e) => handleChange(e, attr)}
-                                                                        />
-                                                                    )}
+                                                                            <DatePicker
+                                                                                selected={
+                                                                                    formData[String(attr.id)]?.value
+                                                                                        ? new Date(formData[String(attr.id)].value)
+                                                                                        : null
+                                                                                }
+                                                                                onChange={(date: Date | null) => {
+                                                                                    if (date) {
+                                                                                        handleChange({ target: { value: date.toISOString().split("T")[0] } }, attr);
+                                                                                    } else {
+                                                                                        handleChange({ target: { value: "" } }, attr);
+                                                                                    }
+                                                                                }}
+                                                                                dateFormat="yyyy-MM-dd"
+                                                                                className="form-control"
+                                                                                showMonthDropdown
+                                                                                showYearDropdown
+                                                                                dropdownMode="select"
+                                                                            />
+                                                                            <i
+                                                                                className="fa fa-calendar"
+                                                                                style={{
+                                                                                    position: "absolute",
+                                                                                    right: "10px",
+                                                                                    top: "50%",
+                                                                                    transform: "translateY(-50%)",
+                                                                                    pointerEvents: "none",
+                                                                                    color: "#007bff", // blue
+                                                                                    fontSize: "16px",
+                                                                                }}
+                                                                            ></i>
+                                                                        </div>
+
+                                                                    )
+                                                                        : (
+                                                                            <input
+                                                                                type={attr.dataType.toLowerCase() === "int" ? "number" : "text"}
+                                                                                className="form-control"
+                                                                                value={formData[String(attr.id)]?.value || ""}
+                                                                                onChange={(e) => handleChange(e, attr)}
+                                                                            />
+                                                                        )}
 
 
                                                                 </div>
@@ -750,7 +763,7 @@ export default function VerticalLinearStepper() {
                                                     Skip
                                                 </Button>
                                             )}
-                                            <Button variant="contained" style={{backgroundColor: "#ea3434"}} onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
+                                            <Button variant="contained" style={{ backgroundColor: "#ea3434" }} onClick={activeStep === steps.length - 1 ? handleSubmit : handleNext}>
                                                 {activeStep === steps.length - 1
                                                     ? selectedRow
                                                         ? 'Update'

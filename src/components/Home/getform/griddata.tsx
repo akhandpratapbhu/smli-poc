@@ -38,6 +38,7 @@ import jsPDF from "jspdf"; // PDF library
 import { generatePrintHTML } from "../printreport";
 import axios from "axios";
 import './getform.css';
+import Loader from '../../shareable/loader';
 interface SpareData {
     id: string;
     invoiceNo: string;
@@ -110,8 +111,9 @@ const SparePartSaleInvoiceTable: React.FC = () => {
 
 
     const [GetAllSaleInvoices, setGetAllSaleInvoices] = useState<SpareData[]>([]);
-
+    const [loading, setLoading] = useState<boolean>(true); // 🔄 loading state
     useEffect(() => {
+        setLoading(true); // 🟡 Show loader before fetch
         fetch(`${baseUrl}/spare/GetListView?ScreenId=${model.id}`)
             .then((response) => response.json())
             .then((data: SpareData[]) => {
@@ -129,8 +131,10 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                     });
                     setColumns(dynamicColumns);
                 }
+                setLoading(false); // ✅ Hide loader after data is set
             })
             .catch((error) => console.error("Error fetching entities:", error));
+        setLoading(false); // ✅ Hide loader even on error
     }, []);
 
 
@@ -527,92 +531,98 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                             </Dialog>
                         </Box>
                     </Box>
-
-                    <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 280px)" }}>
-                        <Table stickyHeader size="small">
-                            {columns.some(col => col.visible) && (
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell padding="checkbox">
-                                            <Checkbox
-                                                indeterminate={
-                                                    selected.length > 0 && selected.length < filteredData.length
-                                                }
-                                                checked={
-                                                    filteredData.length > 0 &&
-                                                    selected.length === filteredData.length
-                                                }
-                                                onChange={handleSelectAllClick}
-                                            />
-                                        </TableCell>
-                                        {columns
-                                            .filter((col) => col.visible)
-                                            .map((column) => (
-                                                <TableCell key={column.id}>
-                                                    <TableSortLabel
-                                                        active={orderBy === column.id}
-                                                        direction={orderBy === column.id ? order : "asc"}
-                                                        onClick={() => handleRequestSort(column.id)}
-                                                    >
-                                                        {column.label}
-                                                    </TableSortLabel>
-                                                </TableCell>
-                                            ))}
-                                    </TableRow>
-                                </TableHead>
-                            )}
-
-                            <TableBody>
-                                {sortedData.length === 0 ? (
-                                    <TableRow >
-                                        <TableCell colSpan={columns.filter(col => col.visible).length + 1} align="center">
-                                            <div style={{ textAlign: "center", padding: "2rem" }}>
-                                                <img
-                                                    src="https://cdn.vectorstock.com/i/500p/12/22/no-data-concept-vector-47041222.jpg"
-                                                    alt="No data"
-                                                    style={{ maxWidth: "150px", marginBottom: "1rem" }}
+                    {loading ? (
+                        <Loader /> // loader component
+                    ) : (
+                        <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 280px)" }}>
+                            <Table stickyHeader size="small">
+                                {columns.some(col => col.visible) && (
+                                    <TableHead>
+                                        <TableRow>
+                                            <TableCell padding="checkbox">
+                                                <Checkbox
+                                                    indeterminate={
+                                                        selected.length > 0 && selected.length < filteredData.length
+                                                    }
+                                                    checked={
+                                                        filteredData.length > 0 &&
+                                                        selected.length === filteredData.length
+                                                    }
+                                                    onChange={handleSelectAllClick}
                                                 />
-                                                <Typography variant="h6" color="textSecondary">
-                                                    No data found
-                                                </Typography>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ) : (
-                                    sortedData
-                                        .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                                        .map((row) => {
-                                            const isItemSelected = isSelected(row.id);
-                                            return (
-                                                <TableRow
-                                                    key={row.id}
-                                                    hover
-                                                    selected={isItemSelected}
-                                                    onClick={(event) => handleClick(event, row.id)}
-                                                >
-                                                    <TableCell padding="checkbox">
-                                                        <Checkbox checked={isItemSelected} />
+                                            </TableCell>
+                                            {columns
+                                                .filter((col) => col.visible)
+                                                .map((column) => (
+                                                    <TableCell key={column.id}>
+                                                        <TableSortLabel
+                                                            active={orderBy === column.id}
+                                                            direction={orderBy === column.id ? order : "asc"}
+                                                            onClick={() => handleRequestSort(column.id)}
+                                                        >
+                                                            {column.label}
+                                                        </TableSortLabel>
                                                     </TableCell>
-                                                    {columns.filter(col => col.visible).map((column) => (
-                                                        <TableCell key={column.id}>
-                                                            {column.id === "Action" ? (
-                                                                <IconButton onClick={() => handleActionClick(row)}>
-                                                                    <MoreVertIcon />
-                                                                </IconButton>
-                                                            ) : (
-                                                                row[column.id]
-                                                            )}
-                                                        </TableCell>
-                                                    ))}
-                                                </TableRow>
-                                            );
-                                        })
+                                                ))}
+                                        </TableRow>
+                                    </TableHead>
                                 )}
-                            </TableBody>
+
+                                <TableBody>
+                                    {sortedData.length === 0 ? (
+                                        <TableRow >
+                                            <TableCell colSpan={columns.filter(col => col.visible).length + 1} align="center">
+                                                <div style={{ textAlign: "center", padding: "2rem" }}>
+                                                    <img
+                                                        src="https://cdn.vectorstock.com/i/500p/12/22/no-data-concept-vector-47041222.jpg"
+                                                        alt="No data"
+                                                        style={{ maxWidth: "150px", marginBottom: "1rem" }}
+                                                    />
+                                                    <Typography variant="h6" color="textSecondary">
+                                                        No data found
+                                                    </Typography>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        sortedData
+                                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                            .map((row) => {
+                                                const isItemSelected = isSelected(row.id);
+                                                return (
+                                                    <TableRow
+                                                        key={row.id}
+                                                        hover
+                                                        selected={isItemSelected}
+                                                        onClick={(event) => handleClick(event, row.id)}
+                                                    >
+                                                        <TableCell padding="checkbox">
+                                                            <Checkbox checked={isItemSelected} />
+                                                        </TableCell>
+                                                        {columns.filter(col => col.visible).map((column) => (
+                                                            <TableCell key={column.id}>
+                                                                {column.id === "Action" ? (
+                                                                    <IconButton onClick={() => handleActionClick(row)}>
+                                                                        <MoreVertIcon />
+                                                                    </IconButton>
+                                                                ) : (
+                                                                    row[column.id]
+                                                                )}
+                                                            </TableCell>
+                                                        ))}
+                                                    </TableRow>
+                                                );
+                                            })
+                                    )}
+                                </TableBody>
 
 
-                        </Table>
-                    </TableContainer>
+                            </Table>
+                        </TableContainer>
+                    )
+
+                    }
+
                     <Dialog open={isPopupOpen} onClose={handleClosePopup} fullWidth maxWidth="sm">
                         <DialogTitle>Actions</DialogTitle>
                         <DialogContent dividers>

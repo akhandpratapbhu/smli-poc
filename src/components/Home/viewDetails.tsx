@@ -42,7 +42,8 @@ const ViewDetails = () => {
 
                 <Grid container spacing={2}>
                     {attributes
-                        .filter(attr => attr.dataType !== 'grid')
+                        .filter(attr => attr.dataType !== 'grid' && attr.entityId>0)
+
                         .map((attr) => (
                             <Grid key={attr.id}>
                                 <Typography variant="subtitle2">{attr.label}</Typography>

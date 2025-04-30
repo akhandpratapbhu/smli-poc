@@ -29,13 +29,10 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
   DialogActions,
 } from "@mui/material";
 import { Search, KeyboardArrowDown, FilterList, TableRows } from "@mui/icons-material";
+import Loader from "../../shareable/loader";
 
 // Define the structure of the API response
 interface Entity {
@@ -102,30 +99,43 @@ const MaterialTableFormData = () => {
 
   // Define state with a type
   const [entities, setEntities] = useState<Entity[]>([]);
-
-    useEffect(() => {
-      fetch(`${baseUrl}/Home/Index`)
-        .then((response) => response.json())
-        .then((data) => setEntities(data))
-        .catch((error) => console.error("Error fetching entities:", error));
-    }, []);  // Empty dependency array to call once when component mounts
-  
-  const getAllMasters = () => {
-    // Fetch data and update state when called    
+  const [loading, setLoading] = useState<boolean>(true); // 🔄 loading state
+  useEffect(() => {
+    setLoading(true); // 🟡 Show loader before fetch
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
-      .then((data) => setEntities(data))
+      .then((data) => {
+        setEntities(data)
+        setLoading(false); // ✅ Hide loader even on error
+      }
+      )
       .catch((error) => console.error("Error fetching entities:", error));
+    setLoading(false); // ✅ Hide loader even on error
+  }, []);  // Empty dependency array to call once when component mounts
+
+  const getAllMasters = () => {
+    // Fetch data and update state when called   
+    setLoading(true); // 🟡 Show loader before fetch 
+    fetch(`${baseUrl}/Home/Index`)
+      .then((response) => response.json())
+      .then((data) => {
+        setEntities(data)
+        setLoading(false); // ✅ Hide loader even on error
+      })
+      .catch((error) => console.error("Error fetching entities:", error));
+    setLoading(false); // ✅ Hide loader even on error
   };
-  
+
   const editRow = (entity: any) => {
     navigate(`/employee/index/${entity.id}`, { state: { entityData: entity } });
   };
 
 
   const handleStatusChange = (id: number) => {
+    setLoading(true); // ✅ Hide loader even on error
     fetch(`${baseUrl}/Home/ChangeStatus?id=${id}`, { method: "GET" })
       .then((response) => {
+        setLoading(false); // ✅ Hide loader even on error
         if (response.ok) {
           alert("Entity modified successfully!");
           // Update state to reflect changes
@@ -136,8 +146,10 @@ const MaterialTableFormData = () => {
             )
           );
         }
+
       })
       .catch((error) => alert(error));
+    setLoading(false); // ✅ Hide loader even on error
   };
   const [showNewMasterModal, setshowNewMasterModal] = useState(false);
   const handleCloseNewMasterModal = () => setshowNewMasterModal(false);
@@ -154,6 +166,7 @@ const MaterialTableFormData = () => {
     }
 
     try {
+      setLoading(true); // ✅ Hide loader even on error
       const response = await fetch(`${baseUrl}/employee/InsertMaster`, {
         method: "POST",
         headers: {
@@ -164,12 +177,14 @@ const MaterialTableFormData = () => {
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
+        setLoading(false); // ✅ Hide loader even on error
       }
 
       const result = await response.json();
       console.log("Success:", result);
+      setLoading(false); // ✅ Hide loader even on error
       alert("Create New Master successfully!");
-     
+
     } catch (error) {
       console.error("Error posting data:", error);
     }
@@ -494,106 +509,108 @@ const MaterialTableFormData = () => {
 
             </Box>
           </Box>
-
-          <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 280px)" }}>
-            <Table stickyHeader size="small">
-              {columns.some(col => col.visible) && (
-                <TableHead>
-                  <TableRow>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        indeterminate={
-                          selected.length > 0 && selected.length < filteredData.length
-                        }
-                        checked={
-                          filteredData.length > 0 &&
-                          selected.length === filteredData.length
-                        }
-                        onChange={handleSelectAllClick}
-                      />
-                    </TableCell>
-                    {columns
-                      .filter((col) => col.visible)
-                      .map((column) => (
-                        <TableCell key={column.id}>
-                          <TableSortLabel
-                            active={orderBy === column.id}
-                            direction={orderBy === column.id ? order : "asc"}
-                            onClick={() => handleRequestSort(column.id)}
-                          >
-                            {column.label}
-                          </TableSortLabel>
-                        </TableCell>
-                      ))}
-                  </TableRow>
-                </TableHead>
-              )}
-
-              <TableBody>
-                {sortedData.length === 0 ? (
-                  <TableRow >
-                    <TableCell colSpan={columns.filter(col => col.visible).length + 1} align="center">
-                      <div style={{ textAlign: "center", padding: "1rem" }}>
-                        <img
-                          src="https://cdn.vectorstock.com/i/500p/12/22/no-data-concept-vector-47041222.jpg"
-                          alt="No data"
-                          style={{ maxWidth: "150px", marginBottom: "1rem" }}
+          {loading ? (<Loader />) : (
+            <TableContainer component={Paper} sx={{ maxHeight: "calc(100vh - 280px)" }}>
+              <Table stickyHeader size="small">
+                {columns.some(col => col.visible) && (
+                  <TableHead>
+                    <TableRow>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          indeterminate={
+                            selected.length > 0 && selected.length < filteredData.length
+                          }
+                          checked={
+                            filteredData.length > 0 &&
+                            selected.length === filteredData.length
+                          }
+                          onChange={handleSelectAllClick}
                         />
-                        <Typography variant="h6" color="textSecondary">
-                          No data found
-                        </Typography>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  sortedData
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map((row) => {
-                      const isItemSelected = isSelected(row.id);
-                      return (
-                        <TableRow
-                          key={row.id}
-                          hover
-                          selected={isItemSelected}
-                          onClick={(event) => handleClick(event, row.id)}
-                        >
-                          <TableCell padding="checkbox">
-                            <Checkbox checked={isItemSelected} />
+                      </TableCell>
+                      {columns
+                        .filter((col) => col.visible)
+                        .map((column) => (
+                          <TableCell key={column.id}>
+                            <TableSortLabel
+                              active={orderBy === column.id}
+                              direction={orderBy === column.id ? order : "asc"}
+                              onClick={() => handleRequestSort(column.id)}
+                            >
+                              {column.label}
+                            </TableSortLabel>
                           </TableCell>
-                          {columns.filter(col => col.visible).map((column) => (
-                            <TableCell key={column.id}>
-                              {column.id === "Action" ? (
-                                <IconButton onClick={() => handleActionClick(row)}>
-                                  <MoreVertIcon />
-                                </IconButton>
-                              ) : column.id === "isActive" ? (
-                                <span style={{ color: row.isActive ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
-                                  {row.isActive ? "Yes" : "No"}
-                                </span>
-                              ) : column.id.toLowerCase().includes('date') && row[column.id] ? ( // <-- Format dates
-                                new Date(row[column.id]).toLocaleString('en-GB', {
-                                  day: '2-digit',
-                                  month: '2-digit',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })
-                              ) : (
-                                row[column.id]
-                              )}
-                            </TableCell>
-
-
-                          ))}
-                        </TableRow>
-                      );
-                    })
+                        ))}
+                    </TableRow>
+                  </TableHead>
                 )}
-              </TableBody>
+
+                <TableBody>
+                  {sortedData.length === 0 ? (
+                    <TableRow >
+                      <TableCell colSpan={columns.filter(col => col.visible).length + 1} align="center">
+                        <div style={{ textAlign: "center", padding: "1rem" }}>
+                          <img
+                            src="https://cdn.vectorstock.com/i/500p/12/22/no-data-concept-vector-47041222.jpg"
+                            alt="No data"
+                            style={{ maxWidth: "150px", marginBottom: "1rem" }}
+                          />
+                          <Typography variant="h6" color="textSecondary">
+                            No data found
+                          </Typography>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    sortedData
+                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                      .map((row) => {
+                        const isItemSelected = isSelected(row.id);
+                        return (
+                          <TableRow
+                            key={row.id}
+                            hover
+                            selected={isItemSelected}
+                            onClick={(event) => handleClick(event, row.id)}
+                          >
+                            <TableCell padding="checkbox">
+                              <Checkbox checked={isItemSelected} />
+                            </TableCell>
+                            {columns.filter(col => col.visible).map((column) => (
+                              <TableCell key={column.id}>
+                                {column.id === "Action" ? (
+                                  <IconButton onClick={() => handleActionClick(row)}>
+                                    <MoreVertIcon />
+                                  </IconButton>
+                                ) : column.id === "isActive" ? (
+                                  <span style={{ color: row.isActive ? '#28a745' : '#dc3545', fontWeight: 'bold' }}>
+                                    {row.isActive ? "Yes" : "No"}
+                                  </span>
+                                ) : column.id.toLowerCase().includes('date') && row[column.id] ? ( // <-- Format dates
+                                  new Date(row[column.id]).toLocaleString('en-GB', {
+                                    day: '2-digit',
+                                    month: '2-digit',
+                                    year: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })
+                                ) : (
+                                  row[column.id]
+                                )}
+                              </TableCell>
 
 
-            </Table>
-          </TableContainer>
+                            ))}
+                          </TableRow>
+                        );
+                      })
+                  )}
+                </TableBody>
+
+
+              </Table>
+            </TableContainer>
+          )}
+
           <Dialog open={isPopupOpen} onClose={handleClosePopup} fullWidth maxWidth="sm">
             <DialogTitle>Actions</DialogTitle>
 

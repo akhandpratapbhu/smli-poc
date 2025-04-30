@@ -111,9 +111,10 @@ const SparePartSaleInvoiceTable: React.FC = () => {
 
 
     const [GetAllSaleInvoices, setGetAllSaleInvoices] = useState<SpareData[]>([]);
-    const [loading, setLoading] = useState<boolean>(true); // 🔄 loading state
+    const [loading, setLoading] = useState<boolean>(true); //  loading state
     useEffect(() => {
-        setLoading(true); // 🟡 Show loader before fetch
+        setLoading(true);
+
         fetch(`${baseUrl}/spare/GetListView?ScreenId=${model.id}`)
             .then((response) => response.json())
             .then((data: SpareData[]) => {
@@ -131,10 +132,12 @@ const SparePartSaleInvoiceTable: React.FC = () => {
                     });
                     setColumns(dynamicColumns);
                 }
-                setLoading(false); // ✅ Hide loader after data is set
+                setLoading(false);
             })
-            .catch((error) => console.error("Error fetching entities:", error));
-        setLoading(false); // ✅ Hide loader even on error
+            .catch((error) =>{
+                console.error("Error fetching entities:", error)
+                setLoading(false);
+            })  
     }, []);
 
 

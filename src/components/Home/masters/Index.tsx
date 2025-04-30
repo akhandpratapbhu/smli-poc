@@ -99,31 +99,37 @@ const MaterialTableFormData = () => {
 
   // Define state with a type
   const [entities, setEntities] = useState<Entity[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); // 🔄 loading state
+  const [loading, setLoading] = useState<boolean>(true); //  loading state
   useEffect(() => {
-    setLoading(true); // 🟡 Show loader before fetch
+    setLoading(true); //  Show loader before fetch
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
       .then((data) => {
         setEntities(data)
-        setLoading(false); // ✅ Hide loader even on error
+        setLoading(false); 
       }
-      )
-      .catch((error) => console.error("Error fetching entities:", error));
-    setLoading(false); // ✅ Hide loader even on error
+      )                          
+      .catch((error) =>{
+        setLoading(false); 
+        console.error("Error fetching entities:", error)
+      } );
   }, []);  // Empty dependency array to call once when component mounts
 
   const getAllMasters = () => {
     // Fetch data and update state when called   
-    setLoading(true); // 🟡 Show loader before fetch 
+    setLoading(true); //  Show loader before fetch 
+  
+
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
       .then((data) => {
         setEntities(data)
-        setLoading(false); // ✅ Hide loader even on error
+        setLoading(false); 
       })
-      .catch((error) => console.error("Error fetching entities:", error));
-    setLoading(false); // ✅ Hide loader even on error
+      .catch((error) =>{
+        setLoading(false); 
+        console.error("Error fetching entities:", error)
+      } );
   };
 
   const editRow = (entity: any) => {
@@ -132,10 +138,10 @@ const MaterialTableFormData = () => {
 
 
   const handleStatusChange = (id: number) => {
-    setLoading(true); // ✅ Hide loader even on error
+    setLoading(true);
     fetch(`${baseUrl}/Home/ChangeStatus?id=${id}`, { method: "GET" })
       .then((response) => {
-        setLoading(false); // ✅ Hide loader even on error
+        setLoading(false); 
         if (response.ok) {
           alert("Entity modified successfully!");
           // Update state to reflect changes
@@ -148,8 +154,11 @@ const MaterialTableFormData = () => {
         }
 
       })
-      .catch((error) => alert(error));
-    setLoading(false); // ✅ Hide loader even on error
+      .catch((error) =>{
+        setLoading(false); 
+        alert(error);
+      })
+   
   };
   const [showNewMasterModal, setshowNewMasterModal] = useState(false);
   const handleCloseNewMasterModal = () => setshowNewMasterModal(false);
@@ -166,7 +175,7 @@ const MaterialTableFormData = () => {
     }
 
     try {
-      setLoading(true); // ✅ Hide loader even on error
+      setLoading(true); 
       const response = await fetch(`${baseUrl}/employee/InsertMaster`, {
         method: "POST",
         headers: {
@@ -177,12 +186,11 @@ const MaterialTableFormData = () => {
 
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
-        setLoading(false); // ✅ Hide loader even on error
       }
 
       const result = await response.json();
       console.log("Success:", result);
-      setLoading(false); // ✅ Hide loader even on error
+      setLoading(false);
       alert("Create New Master successfully!");
 
     } catch (error) {

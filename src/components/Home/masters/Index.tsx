@@ -106,30 +106,30 @@ const MaterialTableFormData = () => {
       .then((response) => response.json())
       .then((data) => {
         setEntities(data)
-        setLoading(false); 
+        setLoading(false);
       }
-      )                          
-      .catch((error) =>{
-        setLoading(false); 
+      )
+      .catch((error) => {
+        setLoading(false);
         console.error("Error fetching entities:", error)
-      } );
+      });
   }, []);  // Empty dependency array to call once when component mounts
 
   const getAllMasters = () => {
     // Fetch data and update state when called   
     setLoading(true); //  Show loader before fetch 
-  
+
 
     fetch(`${baseUrl}/Home/Index`)
       .then((response) => response.json())
       .then((data) => {
         setEntities(data)
-        setLoading(false); 
+        setLoading(false);
       })
-      .catch((error) =>{
-        setLoading(false); 
+      .catch((error) => {
+        setLoading(false);
         console.error("Error fetching entities:", error)
-      } );
+      });
   };
 
   const editRow = (entity: any) => {
@@ -141,7 +141,7 @@ const MaterialTableFormData = () => {
     setLoading(true);
     fetch(`${baseUrl}/Home/ChangeStatus?id=${id}`, { method: "GET" })
       .then((response) => {
-        setLoading(false); 
+        setLoading(false);
         if (response.ok) {
           alert("Entity modified successfully!");
           // Update state to reflect changes
@@ -154,11 +154,11 @@ const MaterialTableFormData = () => {
         }
 
       })
-      .catch((error) =>{
-        setLoading(false); 
+      .catch((error) => {
+        setLoading(false);
         alert(error);
       })
-   
+
   };
   const [showNewMasterModal, setshowNewMasterModal] = useState(false);
   const handleCloseNewMasterModal = () => setshowNewMasterModal(false);
@@ -175,7 +175,7 @@ const MaterialTableFormData = () => {
     }
 
     try {
-      setLoading(true); 
+      setLoading(true);
       const response = await fetch(`${baseUrl}/employee/InsertMaster`, {
         method: "POST",
         headers: {
@@ -544,7 +544,18 @@ const MaterialTableFormData = () => {
                               direction={orderBy === column.id ? order : "asc"}
                               onClick={() => handleRequestSort(column.id)}
                             >
-                              {column.label}
+                              <span
+                                style={{
+                                  color: "rgb(33, 25, 34)",
+                                  fontFamily:
+                                    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Helvetica, "ヒラギノ角ゴ Pro W3", "Hiragino Kaku Gothic Pro", メイリオ, Meiryo, "ＭＳ Ｐゴシック", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"',
+                                  fontSize: "15px",
+                                  fontWeight: "unset"
+                                }}
+                              >
+                                {column.label}
+                              </span>
+
                             </TableSortLabel>
                           </TableCell>
                         ))}
@@ -585,7 +596,18 @@ const MaterialTableFormData = () => {
                             </TableCell>
                             {columns.filter(col => col.visible).map((column) => (
                               <TableCell key={column.id}>
-                                {column.id === "Action" ? (
+                                <span
+                               style={{
+                                color: "#212121", // Dark gray for good contrast
+                                fontFamily: '"Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                                fontSize: "13px", // Slightly smaller for dense table layout
+                                fontWeight: 500, // Medium weight — cleaner than "lighter"
+                                letterSpacing: "0.25px", // Slight spacing for readability
+                                lineHeight: "1.5" // Helps with vertical readability
+                              }}
+                              
+                              >
+                                 {column.id === "Action" ? (
                                   <IconButton onClick={() => handleActionClick(row)}>
                                     <MoreVertIcon />
                                   </IconButton>
@@ -604,6 +626,9 @@ const MaterialTableFormData = () => {
                                 ) : (
                                   row[column.id]
                                 )}
+                              </span>
+
+                               
                               </TableCell>
 
 

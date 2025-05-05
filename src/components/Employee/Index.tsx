@@ -627,7 +627,6 @@ const EntityForm = () => {
   };
 
   const handleRemoveAttributeField = async (id: any) => {
-    console.log("handleRemoveAttributeField", id, fieldAllAttributes, formAttributes);
 
     try {
       const response = await fetch(`${baseUrl}/Home/ChangeAttributeStatus?Id=${id}`, {

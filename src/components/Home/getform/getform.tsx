@@ -496,9 +496,9 @@ export default function VerticalLinearStepper() {
                                         <div className="col-md-10">
                                             <div className="tab-content">
                                                 {section
-                                                    .filter((_, index) => index === activeStep) // 👈 Only show the active section
+                                                    .filter((_, index) => index === activeStep) //  Only show the active section
                                                     .map((section, sectionIndex) => (
-                                                        <div key={sectionIndex} className="mb-4">
+                                                        <div key={sectionIndex} className="mb-4 row">
 
                                                             {section.attributes.map((attr: {
                                                                 id: string | number;
@@ -506,7 +506,8 @@ export default function VerticalLinearStepper() {
                                                                 label: React.ReactNode;
                                                                 dataType: string;
                                                             }, attrIndex: React.Key | null | undefined) => (
-                                                                <div key={attrIndex} className="form-group">
+                                                             
+                                                                <div key={attrIndex} className="form-group col-md-6 mb-3">
                                                                     <label>{attr.label}</label>
 
                                                                     {attr.dataType.toLowerCase() === "dropdown" ? (

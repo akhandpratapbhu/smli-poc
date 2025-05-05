@@ -20,7 +20,6 @@ const PartialForm: React.FC<PartialFormProps> = ({ attributes, onRemoveAttribute
   if (!attributes || attributes.length === 0) return <p>No data available</p>;
   console.log("attributes", attributes);
   function handleRemoveAttributeField(id: any) {
-    console.log(id, typeof id);
     if (onRemoveAttributeField) {
       onRemoveAttributeField(id);
     }

@@ -689,7 +689,7 @@ const [selectedMaster, setSelectedMaster] = useState<any>({
                         style={{ backgroundColor: "rgb(25 135 84)", color: "white" }}
                         onClick={() => editRowMaster(selectedRow)}
                       >
-                        Edit Master Name
+                        Update Master 
                       </Button>
                     )}
                     {selectedRow.isActive && (
@@ -698,7 +698,7 @@ const [selectedMaster, setSelectedMaster] = useState<any>({
                         style={{ backgroundColor: "rgb(25 135 84)", color: "white" }}
                         onClick={() => editRow(selectedRow)}
                       >
-                        Edit Master Form
+                        Update Master Form
                       </Button>
                     )}
 

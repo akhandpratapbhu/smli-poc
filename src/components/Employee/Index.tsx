@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Modal, Button, Form } from "react-bootstrap";
 import { useLocation, useNavigate } from "react-router-dom";
-import PartialForm from "./PartialForm";
+import PartialForm from "./partial-Form/PartialForm";
 import { all } from "axios";
 
 interface AttributeofPartialFormData {
@@ -464,11 +464,11 @@ const EntityForm = () => {
 
       }
     }
-    else if (finalgrid && fieldAllAttributes.length<=0) {
+    else if (finalgrid && fieldAllAttributes.length <= 0) {
       const hasGridData = finalgrid.gridMaster.gridElements.length > 0;
 
       if (hasGridData) {
-        updatedformsection = [ finalgrid];
+        updatedformsection = [finalgrid];
 
       }
     }
@@ -602,17 +602,17 @@ const EntityForm = () => {
       setAllcolumndataWithName({});
       setTableCustomFields([]);
       getSection(String(activeSectionId))
-        // Find current index and move to next
-    const currentIndex = sections.findIndex(s => s.id === currentSectionId);
-    if (currentIndex !== -1 && currentIndex + 1 < sections.length) {
-      // Go to next section
-      const nextSectionId = sections[currentIndex + 1].id;
-      setActiveSectionId(nextSectionId); // Optional if needed
-      getSection(nextSectionId);
-    } else {
-      // No more sections, redirect
-      window.location.href = "/";
-    }
+      // Find current index and move to next
+      const currentIndex = sections.findIndex(s => s.id === currentSectionId);
+      if (currentIndex !== -1 && currentIndex + 1 < sections.length) {
+        // Go to next section
+        const nextSectionId = sections[currentIndex + 1].id;
+        setActiveSectionId(nextSectionId); // Optional if needed
+        getSection(nextSectionId);
+      } else {
+        // No more sections, redirect
+        window.location.href = "/";
+      }
     } catch (error) {
       console.error("Error posting data:", error);
     }
@@ -626,6 +626,28 @@ const EntityForm = () => {
     console.log("Form cancelled");
   };
 
+  const handleRemoveAttributeField = async (id: any) => {
+    console.log("handleRemoveAttributeField", id, fieldAllAttributes, formAttributes);
+
+    try {
+      const response = await fetch(`${baseUrl}/Home/ChangeAttributeStatus?Id=${id}`, {
+        method: 'GET', // or 'PUT' or 'DELETE' based on API spec
+        headers: {
+          'Content-Type': 'application/json'
+        }
+        // body: JSON.stringify({ id }) // only needed for POST with body
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to change status for id ${id}`);
+      }
+      alert(`Attribute with id ${id} status changed successfully.`);
+      getSectionAllData();
+    } catch (error) {
+      console.error('Error updating attribute status:', error);
+    }
+  };
+
 
   return (
     <>
@@ -635,9 +657,10 @@ const EntityForm = () => {
         <input id="EntityName" type="hidden" value={model.name} />
         <input id="SectionId" type="hidden" value={model.sectionId} />
 
-        <div className="row border p-3 rounded" style={{ borderColor: "black",
-         height: "600px", // Set your desired height
-         }}>
+        <div className="row border p-3 rounded" style={{
+          borderColor: "black",
+          height: "600px", // Set your desired height
+        }}>
           <div className="col-md-4">
             <div className="row">
               <div className="col-md-6">
@@ -682,9 +705,10 @@ const EntityForm = () => {
           </div>
           <div className="col-md-8">
             <form>
-              <div className="border p-3 rounded" style={{ borderColor: "red" ,
-                 maxHeight: "500px", // Set your desired height
-                  overflowY: "auto", // Enables vertical scrolling
+              <div className="border p-3 rounded" style={{
+                borderColor: "red",
+                maxHeight: "500px", // Set your desired height
+                overflowY: "auto", // Enables vertical scrolling
               }}>
 
                 {/* === FORM AREA === */}
@@ -696,7 +720,10 @@ const EntityForm = () => {
                   onDrop={handleDrop}
                 >
                   <h5>Drop in Form Area</h5>
-                  <PartialForm attributes={formAttributes as any} />
+                  <PartialForm
+                    attributes={formAttributes}
+                    onRemoveAttributeField={handleRemoveAttributeField}
+                  />
 
                   {(sectionAttributes[activeSectionId || 0] || []).map((attr, index) => (
                     <div key={index} className="row mb-2 align-items-center">
@@ -706,6 +733,7 @@ const EntityForm = () => {
                       </div>
                       <div className="col-md-1">
                         <button
+                          type="button"
                           className="btn btn-sm btn-outline-danger"
                           onClick={() => handleRemoveSectionField(index)}
                           title="Remove field"
@@ -727,26 +755,28 @@ const EntityForm = () => {
                   onDrop={handleDrop}
                 >
                   <h5>Drop in Table Area</h5>
-                  <PartialForm attributes={gridAttributes as any} />
+                  <PartialForm attributes={gridAttributes as any}
+                    onRemoveAttributeField={handleRemoveAttributeField} />
 
 
                   {/* Render attributes dropped for table area for active section */}
                   {(sectionAttributestabularForm[activeSectionId || 0] || []).map((attr, index) => (
-                     <div key={index} className="row mb-2 align-items-center">
-                     <div className="col-md-6">
-                       <label>{attr.label}</label>
-                       <input type="text" className="form-control" readOnly value={attr.label} />
-                     </div>
-                     <div className="col-md-1">
-                       <button
-                         className="btn btn-sm btn-outline-danger"
-                         onClick={() => handleRemovesectionAttributestabularForm(index)}
-                         title="Remove field"
-                       >
-                         &times;
-                       </button>
-                     </div>
-                   </div>
+                    <div key={index} className="row mb-2 align-items-center">
+                      <div className="col-md-6">
+                        <label>{attr.label}</label>
+                        <input type="text" className="form-control" readOnly value={attr.label} />
+                      </div>
+                      <div className="col-md-1">
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => handleRemovesectionAttributestabularForm(index)}
+                          title="Remove field"
+                        >
+                          &times;
+                        </button>
+                      </div>
+                    </div>
                   ))}
 
                   {/* Section-wise rendering of allcolumndataWithName */}
@@ -755,10 +785,11 @@ const EntityForm = () => {
                       <div className="d-flex justify-content-between align-items-center">
                         <h6>{entity}</h6>
                         <button
+                          type="button"
                           className="btn btn-danger btn-sm"
                           onClick={() => handleDeleteEntity(entity)}
                         >
-                          Delete 
+                          Delete
                         </button>
                       </div>
                       <table className="table table-bordered">
@@ -790,7 +821,7 @@ const EntityForm = () => {
               <div className="text-center mt-3">
                 <button type="button" className="btn btn-secondary me-2" onClick={cancelForm}>Close</button>
                 <button type="button" className="btn btn-success" onClick={saveForm}
-                  disabled={updatedformsection.length ==0}
+                  disabled={updatedformsection.length == 0}
                 >Save</button>
 
               </div>

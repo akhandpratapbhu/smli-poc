@@ -32,7 +32,7 @@ import {
   DialogActions,
 } from "@mui/material";
 import { Search, KeyboardArrowDown, FilterList, TableRows } from "@mui/icons-material";
-import Loader from "../../shareable/loader";
+import Loader from "../../shareable/Loader";
 
 // Define the structure of the API response
 interface Entity {

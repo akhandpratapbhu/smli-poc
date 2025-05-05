@@ -64,7 +64,8 @@ const MaterialTableFormData = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
   const [orderBy, setOrderBy] = useState<string>("");
-
+  const [selectedRow, setSelectedRow] = useState<Entity | null>(null);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   // Menu states
   const [manageColumnsAnchor, setManageColumnsAnchor] = useState<HTMLButtonElement | null>(null);
   const [filterAnchor, setFilterAnchor] = useState<HTMLButtonElement | null>(null);
@@ -96,10 +97,17 @@ const MaterialTableFormData = () => {
 
   const navigate = useNavigate();
   const baseUrl = import.meta.env.VITE_API_BASE_URL;
-
+  const [showNewMasterModal, setshowNewMasterModal] = useState(false);
+  const handleCloseNewMasterModal = () => setshowNewMasterModal(false);
   // Define state with a type
   const [entities, setEntities] = useState<Entity[]>([]);
   const [loading, setLoading] = useState<boolean>(true); //  loading state
+  const [isEditMode, setIsEditMode] = useState(false);
+const [newMasterName, setNewMasterName] = useState('');
+const [selectedMaster, setSelectedMaster] = useState<any>({
+  name: ""
+}); // optional, stores selected row
+
   useEffect(() => {
     setLoading(true); //  Show loader before fetch
     fetch(`${baseUrl}/Home/Index`)
@@ -136,7 +144,14 @@ const MaterialTableFormData = () => {
     navigate(`/employee/index/${entity.id}`, { state: { entityData: entity } });
   };
 
-
+  const editRowMaster = (row: Entity) => {
+    setIsEditMode(true);
+    setSelectedMaster(row); // store entire row if needed
+    setNewMasterName(row.label); // populate the form field
+    setshowNewMasterModal(true);
+    setIsPopupOpen(false)
+  };
+  
   const handleStatusChange = (id: number) => {
     setLoading(true);
     fetch(`${baseUrl}/Home/ChangeStatus?id=${id}`, { method: "GET" })
@@ -160,22 +175,41 @@ const MaterialTableFormData = () => {
       })
 
   };
-  const [showNewMasterModal, setshowNewMasterModal] = useState(false);
-  const handleCloseNewMasterModal = () => setshowNewMasterModal(false);
-  const [newMasterName, setNewMasterName] = useState("");
+
+  // const addNewMasterModel = () => {
+  //   setshowNewMasterModal(true);
+  //   setIsPopupOpen(false)
+  // };
   const addNewMasterModel = () => {
+    setIsEditMode(false);
+    setNewMasterName('');
     setshowNewMasterModal(true);
   };
+  
   const saveNewMasterModel = async () => {
     if (newMasterName.trim() === "") return;
-    const requestBody =
-    {
-      id: String(0),
-      formName: newMasterName,
+  
+    let requestBody;
+  
+    if (isEditMode) {
+      // Update Mode
+      console.log("Updating master:", selectedMaster.id, newMasterName);
+      requestBody = {
+        id: String(selectedMaster.id),
+        formName: newMasterName,
+      };
+    } else {
+      // Add Mode
+      console.log("Adding new master:", newMasterName);
+      requestBody = {
+        id: String(0), // ID = 0 for new entries
+        formName: newMasterName,
+      };
     }
-
+  
     try {
       setLoading(true);
+  
       const response = await fetch(`${baseUrl}/employee/InsertMaster`, {
         method: "POST",
         headers: {
@@ -183,23 +217,23 @@ const MaterialTableFormData = () => {
         },
         body: JSON.stringify(requestBody),
       });
-
+  
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
-
+  
       const result = await response.json();
       console.log("Success:", result);
-      setLoading(false);
-      alert("Create New Master successfully!");
-
+      alert(isEditMode ? "Master updated successfully!" : "New master created successfully!");
     } catch (error) {
       console.error("Error posting data:", error);
+    } finally {
+      setLoading(false);
+      getAllMasters();
+      handleCloseNewMasterModal();
     }
-    getAllMasters()
-    handleCloseNewMasterModal();
   };
-
+  
 
   const handleSelectAllClick = (event: ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
@@ -296,8 +330,7 @@ const MaterialTableFormData = () => {
     }
     return 0;
   });
-  const [selectedRow, setSelectedRow] = useState<Entity | null>(null);
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
 
   const handleActionClick = (row: Entity) => {
     setSelectedRow(row);
@@ -329,38 +362,31 @@ const MaterialTableFormData = () => {
 
       {/* Add New Section Modal */}
       <Modal show={showNewMasterModal} onHide={handleCloseNewMasterModal}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add New Master</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <Form>
-            <Form.Group className="mb-2">
-              <Form.Label>Screen Name</Form.Label>
-              {/* <Form.Control type="text" value={model.Label} disabled /> */}
-            </Form.Group>
-            <Form.Group className="mb-2">
-              <Form.Label>Master Name</Form.Label>
-              <Form.Control
-                type="text"
-                value={newMasterName}
-                onChange={(e) => setNewMasterName(e.target.value)}
-              />
-            </Form.Group>
-          </Form>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outlined" color="secondary" onClick={handleCloseNewMasterModal}>Close</Button>
-          <Button
-            variant="contained"
-            color="success"
-            sx={{ m: 1 }}
-            onClick={saveNewMasterModel}
-          >
-            Save
-          </Button>
+  <Modal.Header closeButton>
+    <Modal.Title>{isEditMode ? "Edit Master" : "Add New Master"}</Modal.Title>
+  </Modal.Header>
+  <Modal.Body>
+    <Form>
+      <Form.Group className="mb-2">
+        <Form.Label>Master Name</Form.Label>
+        <Form.Control
+          type="text"
+          value={newMasterName}
+          onChange={(e) => setNewMasterName(e.target.value)}
+        />
+      </Form.Group>
+    </Form>
+  </Modal.Body>
+  <Modal.Footer>
+    <Button variant="outlined" onClick={handleCloseNewMasterModal}>
+      Close
+    </Button>
+    <Button variant="contained" color="success" onClick={saveNewMasterModel}>
+      Save
+    </Button>
+  </Modal.Footer>
+</Modal>
 
-        </Modal.Footer>
-      </Modal>
       <div className="card" style={{
         display: "flex",
         justifyContent: "space-between",
@@ -657,13 +683,22 @@ const MaterialTableFormData = () => {
 
                   {/* Your new buttons here */}
                   <Box mt={2} display="flex" gap={2} flexWrap="wrap">
+                  {selectedRow.isActive && (
+                      <Button
+                        variant="contained"
+                        style={{ backgroundColor: "rgb(25 135 84)", color: "white" }}
+                        onClick={() => editRowMaster(selectedRow)}
+                      >
+                        Edit Master Name
+                      </Button>
+                    )}
                     {selectedRow.isActive && (
                       <Button
                         variant="contained"
                         style={{ backgroundColor: "rgb(25 135 84)", color: "white" }}
                         onClick={() => editRow(selectedRow)}
                       >
-                        EDIT
+                        Edit Master Form
                       </Button>
                     )}
 
